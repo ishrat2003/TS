@@ -1,0 +1,14 @@
+.ipynb_checkpoints
+.DS_Store
+notebooks/data/*
+notebooks/output/*
+notebooks/embeddings/*
+notebooks/Papers/paper2/datasets/bhot/raw/*
+notebooks/Papers/paper2/datasets/brexit/*
+notebooks/examples/*.txt
+notebooks/examples/*.gz
+notebooks/examples/*.p
+notebooks/examples/*.pkl
+notebooks/examples/graph/*
+notebooks/examples/*.csv
+__pycache__
