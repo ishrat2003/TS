@@ -53,7 +53,7 @@ RUN jupyter nbextension enable --py widgetsnbextension
 # RUN rm -f /_PIP_FILE_
 
 # Install TensorFlow CPU version from central repo
-RUN pip3 --no-cache-dir install --upgrade tensorflow
+RUN pip3 --no-cache-dir install --upgrade tensorflow==2.0.0-alpha
 # --- ~ DO NOT EDIT OR DELETE BETWEEN THE LINES --- #
 
 RUN pip3 install ipython jupyter jupyter-tensorboard --upgrade
