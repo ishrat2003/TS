@@ -40,9 +40,9 @@ class Trainer:
         self.ckpt = tf.train.Checkpoint(transformer=self.model, optimizer=self.optimizer)
         self.ckptManager = tf.train.CheckpointManager(self.ckpt, checkpointPath, max_to_keep=10)
 
-        # if a checkpoint exists, restore the latest checkpoint.
+        # if a checkpoint exists, restore the latest checkpoint. https://www.tensorflow.org/guide/checkpoint#loading_mechanics
         if self.ckptManager.latest_checkpoint:
-            ckpt.restore(self.ckptManager.latest_checkpoint)
+            self.ckpt.restore(self.ckptManager.latest_checkpoint)
             print ('Latest checkpoint restored!!')
             
         return

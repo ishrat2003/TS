@@ -45,8 +45,9 @@ class ScaledDot:
             print('Scaled dot scaled_attention_logits :', scaled_attention_logits.shape)
 
         # add the mask to the scaled tensor.
-        # if mask is not None:
-        #     scaled_attention_logits += (mask * -1e9)  
+        if mask is not None:
+            scaled_attention_logits += (mask * -1e9)
+            
         if (self.params.display_details == True) :
             print('Scaled dot scaled_attention_logits :', scaled_attention_logits.shape)
 
