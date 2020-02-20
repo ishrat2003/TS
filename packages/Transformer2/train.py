@@ -15,7 +15,7 @@ from layers.transformer import Transformer
 from network.trainer import Trainer
 
 logging.basicConfig(level=logging.INFO)
-tf.executing_eagerly()
+# tf.executing_eagerly()
 
 logging.info("# 1. Loading script params ")
 logging.info("# ================================")
@@ -39,7 +39,7 @@ vocabProcessor = Vocab(dataProcessor)
 logging.info("# Preparing vocab (source)")
 tokenizerSource = vocabProcessor.get(trainingSet, 'source')
 logging.info("# Preparing vocab (target)")
-tokenizerTarget = vocabProcessor.get(validationSet, 'target')
+tokenizerTarget = vocabProcessor.get(trainingSet, 'target')
 logging.info("# Sample output using source vocab")
 sampleString = 'This news is great'
 vocabProcessor.printSample(tokenizerSource, sampleString)

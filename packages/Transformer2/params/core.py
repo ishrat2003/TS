@@ -16,7 +16,7 @@ class Core:
     self.parser.add_argument('--target_max_sequence_length', default=300) # Summary length
     
     self.parser.add_argument('--buffer_size', default=20000)
-    self.parser.add_argument('--batch_size', default=64)
+    self.parser.add_argument('--batch_size', default=8)
     self.parser.add_argument('--dimensions', default=512)
     self.parser.add_argument('--num_layers', default=4)
     self.parser.add_argument('--num_heads', default=8)

@@ -1,14 +1,15 @@
 from .base import Base
 import tensorflow_datasets as tfds
 
-class Newsroom(Base):
+class ScientificPapers(Base):
     
-    def __init__(self, path):
-        super().__init__(path, 'newsroom')
+    def __init__(self, path, config):
+        self.config = config
+        super().__init__(path, ('scientific_papers_' + config))
         return
 
     def dataset(self):
-        data, metadata = tfds.load('newsroom', 
+        data, metadata = tfds.load(self.config, 
             data_dir = self.getProcessedPath(), 
             with_info = True, 
             as_supervised = True, 
@@ -18,7 +19,7 @@ class Newsroom(Base):
     
     def getGenerator(self, trainingSet, type = 'source'):
         if type == 'source':
-            return (text.numpy() for text, summary in trainingSet)
+            return (article.numpy() for article, abstract in trainingSet)
         
-        return (summary.numpy() for text, summary in trainingSet)
+        return (abstract.numpy() for article, abstract in trainingSet)
     
