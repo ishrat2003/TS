@@ -20,10 +20,10 @@ class Core:
         elif (self.name == 'pt_to_en_translate'):
             self.dataSetProcessor = PtToEnTranslate(self.path)
         elif (self.name == 'scientific_papers_arxiv'):
-            self.dataSetProcessor = ScientificPapers(self.path, 'arxiv')
+            self.dataSetProcessor = ScientificPapers(self.path, 'scientific_papers/arxiv')
         elif (self.name == 'scientific_papers_pubmed'):
-            self.dataSetProcessor = ScientificPapers(self.path, 'pubmed')
-        elif (self.name == 'cnn_daily_mail'):
+            self.dataSetProcessor = ScientificPapers(self.path, 'scientific_papers/pubmed')
+        elif (self.name == 'cnn_dailymail'):
             self.dataSetProcessor = CNNDailyMail(self.path)
 
         return self.dataSetProcessor

@@ -119,13 +119,21 @@ class Trainer:
     
     def endBatch(self, batch, epoch):
         if batch % 50 == 0:
-            print ('Epoch {} Batch {} Loss {:.4f} Accuracy {:.4f}'.format(epoch + 1, batch, self.trainLoss.result(), self.trainAccuracy.result()))
+            print ('Epoch {} Batch {} Loss {:.4f} Accuracy {:.4f} Total {}'.format(epoch + 1, batch, self.trainLoss.result(), self.trainAccuracy.result(), (batch * self.params.batch_size)))
+            
+        if batch % 5000 == 0:
+            self.saveCheckPoint(batch, epoch);
+            
         return
 
     def endEpoch(self, batch, epoch):
-        ckptSavePath = self.ckptManager.save()
-        print ('Saving checkpoint for epoch {} at {}'.format(epoch+1, ckptSavePath))
+        self.saveCheckPoint(batch, epoch)
 
-        print ('Epoch {} Loss {:.4f} Accuracy {:.4f}'.format(epoch + 1, self.trainLoss.result(), self.trainAccuracy.result()))
+        print ('Epoch {} Loss {:.4f} Accuracy {:.4f} Total {}'.format(epoch + 1, self.trainLoss.result(), self.trainAccuracy.result(), (batch * self.params.batch_size)))
         print ('Time taken for 1 epoch: {} secs\n'.format(time.time() - self.start))
+        return
+    
+    def saveCheckPoint(self, batch, epoch):
+        ckptSavePath = self.ckptManager.save()
+        print ('Saving checkpoint for epoch {} batch {} at {}'.format(epoch+1, batch, ckptSavePath))
         return

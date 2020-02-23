@@ -10,7 +10,7 @@ class Core:
     self.parser.add_argument('--display_details', default=False, type=bool)
     self.parser.add_argument('--display_network', default=True, type=bool)
     self.parser.add_argument('--dataset_name', default='newsroom')
-    self.parser.add_argument('--data_directory', default='/content/gdrive/My Drive/Colab Notebooks/data')
+    self.parser.add_argument('--data_directory', default='/content/drive/My Drive/Colab Notebooks/data')
     
     self.parser.add_argument('--source_max_sequence_length', default=1000) # Content length
     self.parser.add_argument('--target_max_sequence_length', default=300) # Summary length
@@ -24,7 +24,7 @@ class Core:
     self.parser.add_argument('--dff', default=512, help = "Positive integer, dimensionality of the output space for FF network")
     self.parser.add_argument('--dropout_rate', default=0.1)
     
-    self.parser.add_argument('--checkpoint_directory', default='/content/gdrive/My Drive/Colab Notebooks/data/checkpoints')
+    self.parser.add_argument('--checkpoint_directory', default='/content/drive/My Drive/Colab Notebooks/data/checkpoints')
     return
 
   def get(self):

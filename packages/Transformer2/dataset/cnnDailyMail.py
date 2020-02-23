@@ -4,11 +4,11 @@ import tensorflow_datasets as tfds
 class CNNDailyMail(Base):
     
     def __init__(self, path):
-        super().__init__(path, 'cnn_daily_mail')
+        super().__init__(path, 'cnn_dailymail')
         return
 
     def dataset(self):
-        data, metadata = tfds.load('CnnDailymail', 
+        data, metadata = tfds.load('cnn_dailymail', 
             data_dir = self.getProcessedPath(), 
             with_info = True, 
             as_supervised = True, 

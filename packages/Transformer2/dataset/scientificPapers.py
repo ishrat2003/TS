@@ -5,7 +5,7 @@ class ScientificPapers(Base):
     
     def __init__(self, path, config):
         self.config = config
-        super().__init__(path, ('scientific_papers_' + config))
+        super().__init__(path, config)
         return
 
     def dataset(self):
