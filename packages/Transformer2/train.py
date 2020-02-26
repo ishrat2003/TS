@@ -68,6 +68,8 @@ transformer = Transformer(params, inputVocabSize, targetVocabSize,
 
 trainer.setModel(transformer)
 trainer.setCheckpoint(params.checkpoint_directory + '/' + params.dataset_name)
+trainer.setTensorboard(params.log_directory + '/' + params.dataset_name)
+trainer.setValidationDataset(validaitionSequences)
 trainer.process(20, trainingSequences)
   
 logging.info('Finished')

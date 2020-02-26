@@ -2,6 +2,8 @@ import tensorflow as tf
 from layers.transformer import Transformer
 from layers.mask import Mask
 import matplotlib.pyplot as plt
+import os
+import datetime
 
 class Sequence():
 
@@ -11,6 +13,7 @@ class Sequence():
         self.targetTokenizer = targetTokenizer
         self.model = Transformer(params)
         self.mask = Mask()
+        self.plotDir = os.path.join(params.plot_directory, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
         return
 
     def process(self, source, plot):
@@ -52,8 +55,8 @@ class Sequence():
         output = tf.squeeze(target, axis=0)
         outputSentence = self.targetTokenizer.decode([i for i in output if i < self.targetTokenizer.vocab_size])
         
-        if plot:
-            self.plotAttentionWeights(attentionWeights, source, outputSentence)
+        
+        self.plotAttentionWeights(attentionWeights, source, outputSentence)
         return outputSentence
     
     def plotAttentionWeights(self, attentionWeights, source, outputSentence, layer = 0):

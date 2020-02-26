@@ -6,6 +6,8 @@ from layers.loss import Loss
 import time
 import numpy
 import  sys
+import os
+import datetime
 
 class Trainer:
     
@@ -20,6 +22,12 @@ class Trainer:
         self.setAccuracyMetrics()
         return
     
+    def setTensorboard(self, logDir):
+        logDir = os.path.join(logDir, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+        # Display with the tensorflow file writer
+        self.writer = tf.summary.create_file_writer(logDir)
+        return
+    
     def getOptimizer(self):
         learningRate = CustomScheduler(self.dModel)
         return tf.optimizers.Adam(learningRate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
@@ -30,6 +38,10 @@ class Trainer:
     
     def setAccuracyMetrics(self):
         self.trainAccuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+        return
+    
+    def setValidationDataset(self, dataset):
+        self.validationDataset = dataset
         return
 
     def setModel(self, model):
@@ -92,8 +104,12 @@ class Trainer:
             self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
             self.trainLoss(loss)
             self.trainAccuracy(targetReal, predictions)
+            # Get the sessions graph
+            graph = tf.compat.v1.keras.backend.get_session().graph
+
+            
             return
-    
+
         for epoch in range(epochs):
             self.startEpoch(epoch)
 
@@ -118,20 +134,29 @@ class Trainer:
         return
     
     def endBatch(self, batch, epoch):
-        if batch % 50 == 0:
-            print ('Epoch {} Batch {} Loss {:.4f} Accuracy {:.4f} Total {}'.format(epoch + 1, batch, self.trainLoss.result(), self.trainAccuracy.result(), (batch * self.params.batch_size)))
+        if batch % 5 == 0:
+            print ('Epoch {} Batch {} Loss {:.4f} Accuracy {:.4f} Total {}'.format(epoch + 1, batch, self.trainLoss.result(), self.trainAccuracy.result(), self.getTotalProcessed(batch)))
             
-        if batch % 5000 == 0:
+        if batch % 5 == 0:
             self.saveCheckPoint(batch, epoch);
-            
+
+        with self.writer.as_default():
+          tf.summary.scalar("loss", self.trainLoss.result(), step=batch)
+          tf.summary.scalar("accuracy", self.trainAccuracy.result(), step=batch)
+          
+        self.writer.flush()
+        
         return
 
     def endEpoch(self, batch, epoch):
         self.saveCheckPoint(batch, epoch)
 
-        print ('Epoch {} Loss {:.4f} Accuracy {:.4f} Total {}'.format(epoch + 1, self.trainLoss.result(), self.trainAccuracy.result(), (batch * self.params.batch_size)))
+        print ('Epoch {} Loss {:.4f} Accuracy {:.4f} Total {}'.format(epoch + 1, self.trainLoss.result(), self.trainAccuracy.result(), self.getTotalProcessed(batch)))
         print ('Time taken for 1 epoch: {} secs\n'.format(time.time() - self.start))
         return
+    
+    def getTotalProcessed(self, batch):
+        return (batch + 1) * self.params.batch_size
     
     def saveCheckPoint(self, batch, epoch):
         ckptSavePath = self.ckptManager.save()

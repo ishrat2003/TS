@@ -25,6 +25,8 @@ class Core:
     self.parser.add_argument('--dropout_rate', default=0.1)
     
     self.parser.add_argument('--checkpoint_directory', default='/content/drive/My Drive/Colab Notebooks/data/checkpoints')
+    self.parser.add_argument('--log_directory', default='/content/drive/My Drive/Colab Notebooks/data/logs')
+    self.parser.add_argument('--plot_directory', default='/content/drive/My Drive/Colab Notebooks/data/plots')
     return
 
   def get(self):
