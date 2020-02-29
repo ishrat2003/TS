@@ -25,9 +25,9 @@ scriptParams.save(params.data_directory)
 
 logging.info("# 2. Preprocessing sequences")
 logging.info("# ================================")
-logging.info("# 2.1. Loading raw dataset")
+logging.info("# 2.1. Loading raw dataset (" + str(params.dataset_percentage) + "%)")
 dataset = Dataset(params.dataset_name, params.data_directory)
-dataProcessor = dataset.get(params.dataset_percentage)
+dataProcessor = dataset.get(float(params.dataset_percentage))
 
 trainingSet, validationSet = dataProcessor.get()
 if not trainingSet or not validationSet:
@@ -70,7 +70,13 @@ trainer.setModel(transformer)
 trainer.setCheckpoint(params.checkpoint_directory + '/' + params.dataset_name)
 trainer.setTensorboard(params.log_directory + '/' + params.dataset_name)
 trainer.setValidationDataset(validaitionSequences)
-trainer.process(params.epochs, trainingSequences)
+
+
+logging.info("# 3.2. Training")
+trainer.process(int(params.epochs), trainingSequences)
+
+logging.info("# 3.3. Evaluation")
+#trainer.evaluation()
   
 logging.info('Finished')
 logging.info("# ================================")
