@@ -8,13 +8,7 @@ class PtToEnTranslate(Base):
         return
 
     def dataset(self):
-        
-        examples, metadata = tfds.load('ted_hrlr_translate/pt_to_en', 
-            data_dir = self.getProcessedPath(), 
-            with_info = True, 
-            as_supervised = True, 
-            download_and_prepare_kwargs = dict(download_config=self.dlConfig))
-        return examples['train'], examples['validation']
+        return self._load('ted_hrlr_translate/pt_to_en')
     
     def getGenerator(self, trainingSet, type = 'source'):
         if type == 'source':

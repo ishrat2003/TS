@@ -8,13 +8,7 @@ class Newsroom(Base):
         return
 
     def dataset(self):
-        data, metadata = tfds.load('newsroom', 
-            data_dir = self.getProcessedPath(), 
-            with_info = True, 
-            as_supervised = True, 
-            download_and_prepare_kwargs = dict(download_config=self.dlConfig))
-        
-        return data['train'], data['validation']
+        return self._load('newsroom')
     
     def getGenerator(self, trainingSet, type = 'source'):
         if type == 'source':

@@ -14,7 +14,7 @@ class Core:
         self.dataSetProcessor = Base(self.path, self.name)
         return
     
-    def get(self):
+    def get(self, percentage = 100):
         if (self.name == 'newsroom'):
             self.dataSetProcessor = Newsroom(self.path)
         elif (self.name == 'pt_to_en_translate'):
@@ -26,6 +26,7 @@ class Core:
         elif (self.name == 'cnn_dailymail'):
             self.dataSetProcessor = CNNDailyMail(self.path)
 
+        self.dataSetProcessor.setSplitPercentage(percentage)
         return self.dataSetProcessor
     
     

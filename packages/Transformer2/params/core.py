@@ -10,11 +10,13 @@ class Core:
     self.parser.add_argument('--display_details', default=False, type=bool)
     self.parser.add_argument('--display_network', default=True, type=bool)
     self.parser.add_argument('--dataset_name', default='newsroom')
+    self.parser.add_argument('--dataset_percentage', default=100, help = "Percentage of dataset for processing")
     self.parser.add_argument('--data_directory', default='/content/drive/My Drive/Colab Notebooks/data')
     
     self.parser.add_argument('--source_max_sequence_length', default=1000) # Content length
     self.parser.add_argument('--target_max_sequence_length', default=300) # Summary length
     
+    self.parser.add_argument('--epochs', default=20)
     self.parser.add_argument('--buffer_size', default=20000)
     self.parser.add_argument('--batch_size', default=8)
     self.parser.add_argument('--dimensions', default=512)
