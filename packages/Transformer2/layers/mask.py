@@ -80,7 +80,7 @@ class Mask:
         # Used in the 1st attention block in the decoder.
         # It is used to pad and mask future tokens in the input received by 
         # the decoder.
-        #lookAheadMask = self.createLookAheadMask(tf.shape(target)[1])
+        lookAheadMask = self.createLookAheadMask(tf.shape(target)[1])
         decoderTargetPaddingMask = self.createPaddingMask(target)
-        #decoderTargetPaddingAndLookAheadMask = tf.maximum(lookAheadMask, decoderTargetPaddingMask)
-        return encoderPaddingMask, None, decoderPaddingMask
+        decoderTargetPaddingAndLookAheadMask = tf.maximum(lookAheadMask, decoderTargetPaddingMask)
+        return encoderPaddingMask, lookAheadMask, decoderPaddingMask

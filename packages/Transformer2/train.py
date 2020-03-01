@@ -27,7 +27,7 @@ logging.info("# 2. Preprocessing sequences")
 logging.info("# ================================")
 logging.info("# 2.1. Loading raw dataset (" + str(params.dataset_percentage) + "%)")
 dataset = Dataset(params.dataset_name, params.data_directory)
-dataProcessor = dataset.get(float(params.dataset_percentage))
+dataProcessor = dataset.get(float(params.dataset_percentage), int(params.total_items))
 
 trainingSet, validationSet = dataProcessor.get()
 if not trainingSet or not validationSet:

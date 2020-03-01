@@ -32,7 +32,10 @@ class Sequences:
         if not validation:
             # cache the dataset to memory to get a speedup while reading from it.
             tokenizedDataset = tokenizedDataset.cache()
-            tokenizedDataset = tokenizedDataset.shuffle(self.params.buffer_size).padded_batch(self.params.batch_size, padded_shapes=([None],[None]))
+            if (self.params.total_items == 0):
+                # No shuffle is only n items of the dataset is processed. Otherwise, training doesn;'t get good accuracy
+                tokenizedDataset = tokenizedDataset.shuffle(self.params.buffer_size)
+            tokenizedDataset = tokenizedDataset.padded_batch(self.params.batch_size, padded_shapes=([None],[None]))
             tokenizedDataset = tokenizedDataset.prefetch(tf.data.experimental.AUTOTUNE)
             
         return tokenizedDataset

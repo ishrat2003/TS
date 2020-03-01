@@ -10,7 +10,7 @@ from params.core import Core as Params
 from dataset.core import Core as Dataset
 from text.vocab import Vocab
 
-from predictor.transformer import TransformerPredictor
+from predictor.sequence import Sequence as TransformerPredictor
 
 
 logging.basicConfig(level=logging.INFO)

@@ -11,21 +11,22 @@ class Core:
     self.parser.add_argument('--display_network', default=True, type=bool)
     self.parser.add_argument('--dataset_name', default='newsroom')
     self.parser.add_argument('--dataset_percentage', default=100, help = "Percentage of dataset for processing")
+    self.parser.add_argument('--total_items', default=0, help = "Total items of data for processing")
     self.parser.add_argument('--data_directory', default='/content/drive/My Drive/Colab Notebooks/data')
     
-    self.parser.add_argument('--source_max_sequence_length', default=1000) # Content length
-    self.parser.add_argument('--target_max_sequence_length', default=300) # Summary length
+    self.parser.add_argument('--source_max_sequence_length', default=1000, type=int) # Content length
+    self.parser.add_argument('--target_max_sequence_length', default=300, type=int) # Summary length
     
-    self.parser.add_argument('--epochs', default=20)
-    self.parser.add_argument('--buffer_size', default=20000)
-    self.parser.add_argument('--batch_size', default=8)
-    self.parser.add_argument('--dimensions', default=512)
-    self.parser.add_argument('--num_layers', default=4)
-    self.parser.add_argument('--num_heads', default=8)
-    self.parser.add_argument('--d_model', default=128)
-    self.parser.add_argument('--dff', default=512, help = "Positive integer, dimensionality of the output space for FF network")
-    self.parser.add_argument('--dropout_rate', default=0.1)
-    
+    self.parser.add_argument('--epochs', default=20, type=int)
+    self.parser.add_argument('--buffer_size', default=20000, type=int)
+    self.parser.add_argument('--batch_size', default=8, type=int)
+    self.parser.add_argument('--dimensions', default=512, type=int)
+    self.parser.add_argument('--num_layers', default=4, type=int)
+    self.parser.add_argument('--num_heads', default=8, type=int)
+    self.parser.add_argument('--d_model', default=128, type=int)
+    self.parser.add_argument('--dff', default=512, type=int, help = "Positive integer, dimensionality of the output space for FF network")
+    self.parser.add_argument('--dropout_rate', default=0.1, type=float)
+
     self.parser.add_argument('--checkpoint_directory', default='/content/drive/My Drive/Colab Notebooks/data/checkpoints')
     self.parser.add_argument('--log_directory', default='/content/drive/My Drive/Colab Notebooks/data/logs')
     self.parser.add_argument('--plot_directory', default='/content/drive/My Drive/Colab Notebooks/data/plots')

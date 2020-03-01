@@ -24,7 +24,7 @@ class Trainer:
         return
     
     def setTensorboard(self, logDir):
-        logDir = os.path.join(logDir, datetime.datetime.now().strftime("%Y%m%d-%H%i%s"))
+        logDir = os.path.join(logDir, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
         # Display with the tensorflow file writer
         self.writer = tf.summary.create_file_writer(logDir)
         return
@@ -78,7 +78,7 @@ class Trainer:
             targetInput = target[:, :-1]
             targetReal = target[:, 1:]
 
-            encoderPaddingMask, decoderTargetPaddingAndLookAheadMask, decoderPaddingMask = self.mask.createMasks(source, target)
+            encoderPaddingMask, decoderTargetPaddingAndLookAheadMask, decoderPaddingMask = self.mask.createMasks(source, targetInput)
 
             if (self.params.display_details == True) :
                 print('trainStep target: ', target.shape)

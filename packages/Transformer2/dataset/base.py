@@ -6,6 +6,7 @@ class Base:
     def __init__(self, path, name = None):
         self.directoryPath = path
         self.name = name
+        self.totalItems = 0
         self.splitPercentage = 100
         self.metadata = None
         if name:
@@ -18,6 +19,10 @@ class Base:
         if ((percentage < 0) or (percentage > 100)):
             percentage = 100
         self.splitPercentage = percentage
+        return
+    
+    def setTotalItems(self, total = 100):
+        self.totalItems = total
         return
     
     def get(self):
@@ -40,10 +45,19 @@ class Base:
         return None
     
     def _load(self, key): 
-        readInstructions = [
-            tfds.core.ReadInstruction('train', to = self.splitPercentage, unit='%'),
-            tfds.core.ReadInstruction('validation', to = self.splitPercentage, unit='%'),
-        ]      
+        if self.totalItems:
+            readInstructions = [
+                tfds.core.ReadInstruction('train', from_ = 1, to = self.totalItems, unit='abs'),
+                tfds.core.ReadInstruction('validation', from_ = 1, to = self.totalItems, unit='abs'),
+            ]
+        elif self.splitPercentage:
+            readInstructions = [
+                tfds.core.ReadInstruction('train', to = self.splitPercentage, unit='%'),
+                tfds.core.ReadInstruction('validation', to = self.splitPercentage, unit='%'),
+            ]
+        else:
+            readInstructions = ['train', 'validation']  
+            
         data, self.metadata = tfds.load(key, 
             data_dir = self.getProcessedPath(), 
             with_info = True, 
