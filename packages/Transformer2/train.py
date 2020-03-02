@@ -12,7 +12,9 @@ from text.vocab import Vocab
 from text.sequences import Sequences
 
 from layers.transformer import Transformer
+from predictor.sequence import Sequence as TransformerPredictor
 from network.trainer import Trainer
+from evaluation.rouge import Rouge
 
 logging.basicConfig(level=logging.INFO)
 # tf.executing_eagerly()
@@ -49,7 +51,8 @@ vocabProcessor.printSample(tokenizerTarget, sampleString)
 logging.info("# 2.3. Preparing sequences (source (text) + target (summary))")
 sequencesProcesser = Sequences(params, tokenizerSource, tokenizerTarget)
 trainingSequences = sequencesProcesser.getTokenizedDataset(trainingSet)
-validaitionSequences = sequencesProcesser.getTokenizedDataset(validationSet)
+#validaitionSequences = sequencesProcesser.getTokenizedDataset(validationSet, True)
+
 # logging.info("# Sample sequences for training dataset")
 # sequencesProcesser.printSample(trainingSequences)
 # logging.info("# Sample sequences for validation dataset")
@@ -69,14 +72,18 @@ transformer = Transformer(params, inputVocabSize, targetVocabSize,
 trainer.setModel(transformer)
 trainer.setCheckpoint(params.checkpoint_directory + '/' + params.dataset_name)
 trainer.setTensorboard(params.log_directory + '/' + params.dataset_name)
-trainer.setValidationDataset(validaitionSequences)
 
+logging.info("# 3.2. Setting predictor")
+trainer.setValidationDataset(validationSet)
 
-logging.info("# 3.2. Training")
+predictor = TransformerPredictor(params, tokenizerSource, tokenizerTarget)
+trainer.setPredictor(predictor)
+
+evaluator = Rouge(transformer, params)
+trainer.setEvaluator(evaluator)
+
+logging.info("# 3.3. Training & Evaluation")
 trainer.process(int(params.epochs), trainingSequences)
-
-logging.info("# 3.3. Evaluation")
-#trainer.evaluation()
   
 logging.info('Finished')
 logging.info("# ================================")

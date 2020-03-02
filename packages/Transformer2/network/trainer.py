@@ -3,6 +3,7 @@ from layers.transformer import Transformer
 from layers.customScheduler import CustomScheduler
 from layers.mask import Mask
 from layers.loss import Loss
+
 import time
 import numpy
 import  sys
@@ -21,6 +22,8 @@ class Trainer:
         self.loss = Loss()
         self.setLossMetrics()
         self.setAccuracyMetrics()
+        self.predictor = None
+        self.evaluator = None
         return
     
     def setTensorboard(self, logDir):
@@ -47,6 +50,14 @@ class Trainer:
 
     def setModel(self, model):
         self.model = model
+        return
+    
+    def setPredictor(self, predictor):
+        self.predictor = predictor
+        return
+    
+    def setEvaluator(self, evaluator):
+        self.evaluator = evaluator
         return
     
     def setCheckpoint(self, checkpointPath):
@@ -123,6 +134,29 @@ class Trainer:
                 
         return
     
+    def evaluation(self, batch, epoch):
+        if not self.validationDataset:
+            return
+
+        for (batch, (source, target)) in enumerate(self.validationDataset):
+                source = source.numpy().decode('utf-8')
+                target = target.numpy().decode('utf-8')
+                generated = self.predictor.process(source)
+                score = self.evaluator.getScore(target, generated)
+                
+                if (self.params.display_details == True) :
+                    print('Batch: ', batch)
+                    print('source', source.shape)
+                    print('target', target.shape)
+                    print('source: ', source)
+                    print('target: ', target)
+                    print('generated: ', generated)
+                    print('score: ', score)
+                
+                self.saveSummary(batch, epoch, score)
+                
+        return
+    
     def startEpoch(self, epoch):
         print('Starting epoch: ', (epoch+1))
         self.start = time.time()
@@ -139,6 +173,7 @@ class Trainer:
 
     def endEpoch(self, batch, epoch):
         self.saveCheckPoint(batch, epoch)
+        self.evaluation(batch, epoch)
         
         print ('Epoch {} Loss {:.4f} Accuracy {:.4f} Total {}'.format(epoch + 1, self.trainLoss.result(), self.trainAccuracy.result(), self.getTotalProcessed(batch)))
         print ('Time taken for 1 epoch: {} secs\n'.format(time.time() - self.start))
@@ -147,11 +182,19 @@ class Trainer:
     def getTotalProcessed(self, batch):
         return (batch + 1) * self.params.batch_size
     
-    def saveSummary(self, batch, epoch):
-        claculatedStep = epoch * 1000 + batch
+        
+    def saveSummary(self, batch, epoch, score = None):
         with self.writer.as_default():
-            tf.summary.scalar("loss", self.trainLoss.result(), step=claculatedStep)
-            tf.summary.scalar("accuracy", self.trainAccuracy.result(), step=claculatedStep)
+            tf.summary.scalar("batch-loss", self.trainLoss.result(), step=batch)
+            tf.summary.scalar("batch-accuracy", self.trainAccuracy.result(), step=batch)
+            
+            if score:
+                tf.summary.scalar("epoch-loss", self.trainLoss.result(), step=epoch)
+                tf.summary.scalar("epoch-accuracy", self.trainAccuracy.result(), step=epoch)
+                for key in score.keys():
+                    for matrixKey in score[key]:
+                        trackingKey = str('epoch-' + key + '-' + matrixKey)
+                        tf.summary.scalar(trackingKey, score[key][matrixKey], step=epoch)
         
         self.writer.flush()
         return

@@ -1,16 +1,23 @@
 '''
 https://github.com/google-research/google-research/tree/master/rouge
 '''
-import rouge_scorer
+from rouge_score import rouge_scorer
 
 class Rouge:
 
     def __init__(self, model, params):
         self.model = model
         self.params = params
-        self.scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rouge3', 'rougeL'], use_stemmer=True)
+        self.keys = ['rouge1', 'rouge2', 'rouge3', 'rougeL']
+        self.scorer = rouge_scorer.RougeScorer(self.keys, use_stemmer=True)
         return
     
     def getScore(self, target, generated):
-        score = scorer.score(target, generated)
-        return score
+        score = self.scorer.score(target, generated)
+        processedScores = {}
+        for key in self.keys:
+            processedScores[key] = {}
+            processedScores[key]['precision'] = getattr(score[key], 'precision')
+            processedScores[key]['recall'] = getattr(score[key], 'recall')
+            processedScores[key]['fmeasure'] = getattr(score[key], 'fmeasure')
+        return processedScores

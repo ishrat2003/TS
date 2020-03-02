@@ -66,9 +66,12 @@ class Sequence():
         return self.outputSentence
     
     # def plotAttention(self, attentionWeights, source, outputSentence, layer = 0):
+    #     if not self.attentionWeights or (layer not in self.attentionWeights.keys()):
+    #         return
+        
     #     fig = plt.figure(figsize=(16, 8))
     #     sentence = self.sourceTokenizer.encode(sentence)
-    #     attention = tf.squeeze(attentionWeights[layer], axis=0)
+    #     attention = tf.squeeze(self.attentionWeights[layer], axis=0)
 
     #     for head in range(attentionWeights.shape[0]):
     #     ax = fig.add_subplot(2, 4, head+1)
