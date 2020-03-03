@@ -4,6 +4,7 @@ from layers.mask import Mask
 import matplotlib.pyplot as plt
 import os
 import datetime
+import io
 
 class Sequence():
 
@@ -14,15 +15,21 @@ class Sequence():
         inputVocabSize = self.sourceTokenizer.vocab_size + 2
         targetVocabSize = self.targetTokenizer.vocab_size + 2
         self.model = Transformer(params, inputVocabSize, targetVocabSize, 
-                          inputVocabSize, 
-                          targetVocabSize)
+                          inputVocabSize, targetVocabSize)
         self.mask = Mask()
+        self.source = None
         self.attentionWeights = None
         self.outputSentences = None
-        self.plotDir = os.path.join(params.plot_directory, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+        self.plotDir = os.path.join(params.plot_directory, params.dataset_name, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+        self.setTensorboard(self.plotDir)
+        return
+    
+    def setTensorboard(self, logDir):
+        self.writer = tf.summary.create_file_writer(logDir)
         return
 
     def process(self, source):
+        self.source = source
         startToken = [self.sourceTokenizer.vocab_size]
         endToken = [self.sourceTokenizer.vocab_size + 1]
 
@@ -59,42 +66,63 @@ class Sequence():
             # as its input.
             target = tf.concat([target, predicted_id], axis=-1)
 
-        output = tf.squeeze(target, axis=0)
-        self.outputSentence = self.targetTokenizer.decode([i for i in output if i < self.targetTokenizer.vocab_size])
+        self.output = tf.squeeze(target, axis=0)
+        self.outputSentence = self.targetTokenizer.decode([i for i in self.output if i < self.targetTokenizer.vocab_size])
         self.attentionWeights = attentionWeights
         
         return self.outputSentence
     
-    # def plotAttention(self, attentionWeights, source, outputSentence, layer = 0):
-    #     if not self.attentionWeights or (layer not in self.attentionWeights.keys()):
-    #         return
+    def plotAttentions(self, layer = 0):
+        if not self.attentionWeights:
+            return
         
-    #     fig = plt.figure(figsize=(16, 8))
-    #     sentence = self.sourceTokenizer.encode(sentence)
-    #     attention = tf.squeeze(self.attentionWeights[layer], axis=0)
+        for layer in self.attentionWeights.keys():
+            self.plotAttention(layer)
+            
+        return
+    
+    
+    def plotAttention(self, layer = 0):
+        if not self.attentionWeights or (layer not in self.attentionWeights.keys()):
+            return
 
-    #     for head in range(attentionWeights.shape[0]):
-    #     ax = fig.add_subplot(2, 4, head+1)
+        fig = plt.figure(figsize=(16, 8))
+        sentence = self.sourceTokenizer.encode(self.source)
+        attention = tf.squeeze(self.attentionWeights[layer], axis=0)
 
-    #     # plot the attention weights
-    #     ax.matshow(attentionWeights[head][:-1, :], cmap='viridis')
+        for head in range(self.attentionWeights.shape[0]):
+            ax = fig.add_subplot(2, 4, head+1)
 
-    #     fontdict = {'fontsize': 10}
+            # plot the attention weights
+            ax.matshow(self.attentionWeights[head][:-1, :], cmap='viridis')
 
-    #     ax.set_xticks(range(len(sentence)+2))
-    #     ax.set_yticks(range(len(outputSentence)))
+            fontdict = {'fontsize': 10}
 
-    #     ax.set_ylim(len(outputSentence)-1.5, -0.5)
+            ax.set_xticks(range(len(sentence)+2))
+            ax.set_yticks(range(len(outputSentence)))
 
-    #     ax.set_xticklabels(
-    #     ['<start>']+[self.sourceTokenizer.decode([i]) for i in sentence]+['<end>'], 
-    #     fontdict=fontdict, rotation=90)
+            ax.set_ylim(len(outputSentence)-1.5, -0.5)
 
-    #     ax.set_yticklabels([self.targetTokenizer.decode([i]) for i in output 
-    #                     if i < self.targetTokenizer.vocab_size], 
-    #                     fontdict=fontdict)
+            ax.set_xticklabels(
+            ['<start>']+[self.sourceTokenizer.decode([i]) for i in sentence]+['<end>'], 
+            fontdict=fontdict, rotation=90)
 
-    #     ax.set_xlabel('Head {}'.format(head+1))
+            ax.set_yticklabels([self.targetTokenizer.decode([i]) for i in self.output
+                            if i < self.targetTokenizer.vocab_size], 
+                            fontdict=fontdict)
 
-    #     plt.tight_layout()
-    #     plt.show()
+            ax.set_xlabel('Head {}'.format(head+1))
+
+        plt.tight_layout()
+        #plt.show()
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        plt.close(fig)
+        buf.seek(0)
+        image = tf.image.decode_png(buf.getvalue(), channels=4)
+        image = tf.expand_dims(image, 0)
+        
+        with self.writer.as_default():
+            tf.summary.image("Attention weight", image, step=layer)
+            self.writer.flush()
+        return

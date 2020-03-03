@@ -73,12 +73,14 @@ trainer.setModel(transformer)
 trainer.setCheckpoint(params.checkpoint_directory + '/' + params.dataset_name)
 trainer.setTensorboard(params.log_directory + '/' + params.dataset_name)
 
-logging.info("# 3.2. Setting predictor")
+logging.info("# 3.2. Setting validation set")
 trainer.setValidationDataset(validationSet)
 
+logging.info("# 3.2. Setting predictor")
 predictor = TransformerPredictor(params, tokenizerSource, tokenizerTarget)
 trainer.setPredictor(predictor)
 
+logging.info("# 3.2. Setting predictor")
 evaluator = Rouge(transformer, params)
 trainer.setEvaluator(evaluator)
 

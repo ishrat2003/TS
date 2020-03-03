@@ -41,13 +41,14 @@ tokenizerTarget = vocabProcessor.get(trainingSet, 'target')
 
 logging.info("# 3. Predict")
 logging.info("# ================================")
-
-input = "este é um problema que temos que resolver.";
+source, target = next(iter(trainingSet))
+input = source.numpy().decode('utf-8')
 predictor = TransformerPredictor(params, tokenizerSource, tokenizerTarget)
 output = predictor.process(input)
 
 print('Input: ', input)
 print('Output: ', output)
+print('Actual', target.numpy().decode('utf-8'))
 
 logging.info('Finished')
 logging.info("# ================================")
