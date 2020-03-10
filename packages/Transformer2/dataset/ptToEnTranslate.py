@@ -3,8 +3,8 @@ import tensorflow_datasets as tfds
 
 class PtToEnTranslate(Base):
     
-    def __init__(self, path):
-        super().__init__(path, 'pt_to_en_translate')
+    def __init__(self, path, supervised = True):
+        super().__init__(path, 'pt_to_en_translate', supervised)
         return
 
     def dataset(self):

@@ -3,9 +3,9 @@ import tensorflow_datasets as tfds
 
 class ScientificPapers(Base):
     
-    def __init__(self, path, config):
+    def __init__(self, path, config, supervised = True):
         self.config = config
-        super().__init__(path, config)
+        super().__init__(path, config, supervised)
         return
 
     def dataset(self):

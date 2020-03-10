@@ -3,8 +3,8 @@ import tensorflow_datasets as tfds
 
 class CNNDailyMail(Base):
     
-    def __init__(self, path):
-        super().__init__(path, 'cnn_dailymail/plain_text')
+    def __init__(self, path, supervised = True):
+        super().__init__(path, 'cnn_dailymail/plain_text', supervised)
         return
 
     def dataset(self):

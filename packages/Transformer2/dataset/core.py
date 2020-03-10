@@ -5,6 +5,8 @@ from .newsroom import Newsroom
 from .ptToEnTranslate import PtToEnTranslate
 from .scientificPapers import ScientificPapers
 from .cnnDailyMail import CNNDailyMail
+from .wikiHow import WikiHow
+from .multiNews import MultiNews
 
 class Core:
 
@@ -25,10 +27,11 @@ class Core:
             self.dataSetProcessor = ScientificPapers(self.path, 'scientific_papers/pubmed')
         elif (self.name == 'cnn_dailymail'):
             self.dataSetProcessor = CNNDailyMail(self.path)
+        elif (self.name == 'wikihow'):
+            self.dataSetProcessor = WikiHow(self.path)
+        elif (self.name == 'multi_news'):
+            self.dataSetProcessor = MultiNews(self.path)
 
         self.dataSetProcessor.setSplitPercentage(percentage)
         self.dataSetProcessor.setTotalItems(total)
         return self.dataSetProcessor
-    
-    
-   

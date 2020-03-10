@@ -3,14 +3,17 @@ import tensorflow_datasets as tfds
 
 class Newsroom(Base):
     
-    def __init__(self, path):
-        super().__init__(path, 'newsroom')
+    def __init__(self, path, supervised = True):
+        super().__init__(path, 'newsroom', supervised)
         return
 
     def dataset(self):
         return self._load('newsroom')
     
     def getGenerator(self, trainingSet, type = 'source'):
+        if (not self.supervised):
+            return (item for item in trainingSet)
+        
         if type == 'source':
             return (text.numpy() for text, summary in trainingSet)
         
