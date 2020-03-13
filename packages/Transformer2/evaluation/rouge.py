@@ -5,8 +5,7 @@ from rouge_score import rouge_scorer
 
 class Rouge:
 
-    def __init__(self, model, params):
-        self.model = model
+    def __init__(self, params):
         self.params = params
         self.keys = ['rouge1', 'rouge2', 'rouge3', 'rougeL']
         self.scorer = rouge_scorer.RougeScorer(self.keys, use_stemmer=True)

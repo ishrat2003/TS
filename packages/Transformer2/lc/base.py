@@ -84,6 +84,7 @@ class Base():
 		print('----------------------')
 		print("Total local vocab: ", len(self.wordInfo))
 		print("Filtered local vocab: ", len(self.filteredWords))
+		print(self.filteredWords)
 		return self.filteredWords
 
 
@@ -113,6 +114,7 @@ class Base():
 			self.sentences.append(currentSentence)
 
 		self.filteredWords = self.wordInfo
+		print(self.filteredWords)
 		return self.sentences
 
 

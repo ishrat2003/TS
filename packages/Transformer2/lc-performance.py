@@ -2,12 +2,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os, logging, sys
 from params.core import Core as Params
 from dataset.core import Core as Dataset
-from text.vocab import Vocab
-from text.sequences import Sequences
-
+from lc.evaluate import Evaluate
 
 logging.basicConfig(level=logging.INFO)
-# tf.executing_eagerly()
 
 logging.info("# 1. Loading script params ")
 logging.info("# ================================")
@@ -26,23 +23,14 @@ if not trainingSet or not validationSet:
     logging.error('No dataset found')
     sys.exit()
 
-testSource = dataProcessor.getGenerator(trainingSet, 'source')
-#testTitle = dataProcessor.getGenerator(trainingSet, 'title')
-testTarget = dataProcessor.getGenerator(trainingSet, 'target')
-print(testSource)
-print('==============================================')
-# for source in testSource:
-#   print('Content: ', source.decode('utf-8'))
-  
+evaluationProcessor = Evaluate(trainingSet, params)
+allowedTypes = ['NN', 'NNP', 'NNS', 'NNPS']
+#allowedTypes = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+#allowedTypes = ['JJ', 'JJR', 'JJS']
+#allowedTypes = ['RB', 'RBR', 'RBS']
+#allowedTypes = ["CC","CD","DT","EX","FW","IN","JJ","JJR","JJS","LS","MD","NN","NNS","NNP","NNPS","PDT","POS","PRP","PRP$","RB","RBR","RBS","RP","SYM","TO","UH","VB","VBD","VBG","VBN","VBP","VBZ","WDT","WP","WP$","WRB"]
+#allowedTypes = ['NN', 'NNP', 'NNS', 'NNPS', 'JJ', 'JJR', 'JJS' 'RB', 'RBR', 'RBS', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+evaluationProcessor.setAllowedTypes(allowedTypes)
+evaluationProcessor.process()
 
-# for target in testTarget:
-#   print('Summary: ', target.decode('utf-8'))
-#   print('----------')
-
-
-for (batch, (source, target)) in enumerate(trainingSet):
-  print('Batch: ', batch)
-
-  print('Content:::::::::::: ', source.numpy().decode('utf-8'))
-  print('Summary:::::::::::: ', target.numpy().decode('utf-8'))
 
