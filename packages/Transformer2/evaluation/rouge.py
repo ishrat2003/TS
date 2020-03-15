@@ -5,9 +5,9 @@ from rouge_score import rouge_scorer
 
 class Rouge:
 
-    def __init__(self, params):
+    def __init__(self, params, keys = None):
         self.params = params
-        self.keys = ['rouge1', 'rouge2', 'rouge3', 'rougeL']
+        self.keys = ['rouge1', 'rouge2', 'rouge3', 'rougeL'] if not keys else keys
         self.scorer = rouge_scorer.RougeScorer(self.keys, use_stemmer=True)
         return
     

@@ -11,7 +11,7 @@ from matplotlib.pylab import rcParams
 class Base():
 
 
-	def __init__(self, text, filterRate = 0):
+	def __init__(self, text, filterRate = 0, display = False):
 		self.rawText = text
 		self.text = self.__clean(text)
 		self.stopWords = utility.Utility.getStopWords()
@@ -28,6 +28,7 @@ class Base():
 		self.topScorePercentage = filterRate
 		self.filteredWords = {}
 		self.contributors = []
+		self.display = display
 		return
 
 
@@ -58,6 +59,10 @@ class Base():
 		return self.text
 
 
+	def getFilteredWords(self):
+		return self.filteredWords
+
+
 	def getContrinutors(self):
 		return self.contributors
 
@@ -72,6 +77,7 @@ class Base():
 
 	def loadFilteredWords(self):
 		minAllowedScore = self.maxCount * self.filterRate
+		
 		self.filteredWords = {}
 		for word in self.wordInfo:
 			if self.wordInfo[word]['count'] <= minAllowedScore:
@@ -81,10 +87,11 @@ class Base():
 			self.filteredWords[word] = self.wordInfo[word]
 			self.filteredWords[word]['index'] = index
 
-		print('----------------------')
-		print("Total local vocab: ", len(self.wordInfo))
-		print("Filtered local vocab: ", len(self.filteredWords))
-		print(self.filteredWords)
+		if self.display:
+			print('----------------------')
+			print("Total local vocab: ", len(self.wordInfo))
+			print("Filtered local vocab: ", len(self.filteredWords))
+			print(self.filteredWords)
 		return self.filteredWords
 
 
@@ -114,7 +121,8 @@ class Base():
 			self.sentences.append(currentSentence)
 
 		self.filteredWords = self.wordInfo
-		print(self.filteredWords)
+		if self.display:
+			print(self.filteredWords)
 		return self.sentences
 
 
@@ -146,7 +154,7 @@ class Base():
 		if not len(self.wordInfo):
 			return None
 
-		topWordScores = self.maxScore * self.topScorePercentage
+		minTopWordScores = self.maxScore * self.topScorePercentage
 
 		points = []
 		for word in self.filteredWords:
@@ -157,7 +165,7 @@ class Base():
 			point['label'] = self.filteredWords[word]['pure_word']
 			point['type'] = self.filteredWords[word]['type']
 
-			if self.isTopic(word, topWordScores):
+			if self.isTopic(word, minTopWordScores):
 				point['color'] = 'red'
 				self.contributors.append(word)
 
@@ -166,8 +174,8 @@ class Base():
 		return points
 
 
-	def isTopic(self, word, topWordScores):
-		return (self.filteredWords[word]['score'] >= topWordScores)
+	def isTopic(self, word, minTopWordScores):
+		return (self.filteredWords[word]['score'] >= minTopWordScores)
 
 	def _getX(self, word):
 		return 0
