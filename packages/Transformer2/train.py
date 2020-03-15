@@ -81,7 +81,7 @@ predictor = TransformerPredictor(params, tokenizerSource, tokenizerTarget)
 trainer.setPredictor(predictor)
 
 logging.info("# 3.2. Setting predictor")
-evaluator = Rouge(transformer, params)
+evaluator = Rouge(params)
 trainer.setEvaluator(evaluator)
 
 logging.info("# 3.3. Training & Evaluation")

@@ -3,12 +3,14 @@ import tensorflow_datasets as tfds
 
 class Base:
     
-    def __init__(self, path, name = None):
+    def __init__(self, path, name = None, supervised = True):
         self.directoryPath = path
         self.name = name
         self.totalItems = 0
         self.splitPercentage = 100
         self.metadata = None
+        self.supervised = supervised
+        
         if name:
             self.path = os.path.join(path, self.name)
         else:
@@ -47,8 +49,8 @@ class Base:
     def _load(self, key): 
         if self.totalItems:
             readInstructions = [
-                tfds.core.ReadInstruction('train', from_ = 1, to = self.totalItems, unit='abs'),
-                tfds.core.ReadInstruction('validation', from_ = 1, to = self.totalItems, unit='abs'),
+                tfds.core.ReadInstruction('train', from_ = 1, to = self.totalItems + 1, unit='abs'),
+                tfds.core.ReadInstruction('validation', from_ = 1, to = self.totalItems + 1, unit='abs'),
             ]
         elif self.splitPercentage:
             readInstructions = [
@@ -61,7 +63,7 @@ class Base:
         data, self.metadata = tfds.load(key, 
             data_dir = self.getProcessedPath(), 
             with_info = True, 
-            as_supervised = True, 
+            as_supervised = self.supervised, 
             download_and_prepare_kwargs = dict(download_config=self.dlConfig),
             split = readInstructions)
         
