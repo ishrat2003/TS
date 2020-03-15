@@ -124,7 +124,6 @@ class Evaluate:
         return self.getContributor(text, topScorePercentage, allWords)
     
     def getContributor(self, text, topScorePercentage = 0.2, allWords = False):
-        
         minAllowedScore = 0 if allWords else 0.1
 
         peripheralProcessor = Peripheral(text)
@@ -132,7 +131,7 @@ class Evaluate:
         peripheralProcessor.setPositionContributingFactor(1)
         peripheralProcessor.setOccuranceContributingFactor(1)
         peripheralProcessor.setProperNounContributingFactor(1)
-        peripheralProcessor.setTopScorePercentage(0.2)
+        peripheralProcessor.setTopScorePercentage(topScorePercentage)
         peripheralProcessor.setFilterWords(minAllowedScore)
         peripheralProcessor.loadSentences(text)
         peripheralProcessor.loadFilteredWords()
