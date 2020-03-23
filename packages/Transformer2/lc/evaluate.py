@@ -44,77 +44,92 @@ class Evaluate:
         return
 
     def process(self, store = True):
-        info = {}
-        info['total'] = 0
+
+        self.initInfo()
+                    
+        for (batch, (source, target)) in enumerate(self.dataset):
+            sourceText = source.numpy().decode('utf-8')
+            targetText = target.numpy().decode('utf-8')
+            row = self.processItem(batch, sourceText, targetText)
+            print('===================================================')
+            print(row)
+            self.file.write(row)
+            info['total'] += 1
+            
+            
+        self.summarizeInfo()
+        return
+    
+    def processItem(self, batch, sourceText, targetText):
+        seperator = ' '
+        if self.params.display_details:
+            print('Batch:::::::::::::::::: ', batch)
+            print('Content::: ', sourceText)
+            print('Summary::: ', targetText)
+        
+        row = {}
+        # row['main_text'] = sourceText
+        # row['summary_text'] = targetText
+        
+        for posType in self.posGroups:
+            self.setAllowedTypes(self.posGroups[posType])
+            for topScorePercentage in self.topScorePrecentages:
+            
+                generatedContributor = self.getContributor(sourceText, topScorePercentage)
+                expectedContributor = self.getContributor(targetText, 0, True)
+                
+                generatedContributor = seperator.join(generatedContributor)
+                expectedContributor = seperator.join(expectedContributor)
+                
+                evaluationScore = self.rouge.getScore(expectedContributor, generatedContributor)
+                
+                suffix = self.getSuffix(posType, topScorePercentage)
+                row['expected_summary_' + suffix] = expectedContributor
+                row['generated_contributor_' + suffix] = generatedContributor
+                row['rouge1_precision_' + suffix] = evaluationScore['rouge1']['precision']
+                row['rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
+                #row['rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
+                
+                self.info['total_precision_' + suffix] += evaluationScore['rouge1']['precision']
+                self.info['total_recall_' + suffix] += evaluationScore['rouge1']['recall']
+                # info['total_fmeasure_' + suffix] += evaluationScore['rouge1']['fmeasure']
+                
+        
+        return row
+    
+    def initInfo(self):
+        self.info = {}
+        self.info['total'] = 1
         
         for posType in self.posGroups:
             for topScorePercentage in self.topScorePrecentages:
                 suffix = self.getSuffix(posType, topScorePercentage)
-                info['total_precision_' + suffix] = 0
-                info['total_recall_' + suffix] = 0
-                # info['total_fmeasure_' + suffix] = 0
-                    
-        for (batch, (source, target)) in enumerate(self.dataset):
-            seperator = ' '
-            info['total'] += 1
-            sourceText = source.numpy().decode('utf-8')
-            targetText = target.numpy().decode('utf-8')
-            
-            if self.params.display_details:
-                print('Batch:::::::::::::::::: ', batch)
-                print('Content::: ', sourceText)
-                print('Summary::: ', targetText)
-            
-            row = {}
-            # row['main_text'] = sourceText
-            # row['summary_text'] = targetText
-            
-            for posType in self.posGroups:
-                self.setAllowedTypes(self.posGroups[posType])
-                for topScorePercentage in self.topScorePrecentages:
+                self.info['total_precision_' + suffix] = 0
+                self.info['total_recall_' + suffix] = 0
+                # self.info['total_fmeasure_' + suffix] = 0
                 
-                    generatedContributor = self.getContributor(sourceText, topScorePercentage)
-                    expectedContributor = self.getContributor(targetText, 0, True)
-                    
-                    generatedContributor = seperator.join(generatedContributor)
-                    expectedContributor = seperator.join(expectedContributor)
-                    
-                    evaluationScore = self.rouge.getScore(expectedContributor, generatedContributor)
-                  
-                    suffix = self.getSuffix(posType, topScorePercentage)
-                    row['expected_summary_' + suffix] = expectedContributor
-                    row['generated_contributor_' + suffix] = generatedContributor
-                    row['rouge1_precision_' + suffix] = evaluationScore['rouge1']['precision']
-                    row['rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
-                    #row['rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
-                    
-                    info['total_precision_' + suffix] += evaluationScore['rouge1']['precision']
-                    info['total_recall_' + suffix] += evaluationScore['rouge1']['recall']
-                    # info['total_fmeasure_' + suffix] += evaluationScore['rouge1']['fmeasure']
-            
-            print('===================================================')
-            print(row)
-            self.file.write(row)
-            
+        return
+    
+    def summarizeInfo(self):
         for posType in self.posGroups:
             for topScorePercentage in self.topScorePrecentages:
                 suffix = self.getSuffix(posType, topScorePercentage)
-                info['avg_precision_' + suffix] = info['total_precision_' + suffix] / info['total']
-                info['avg_recall_' + suffix] = info['total_precision_' + suffix] / info['total']
+                self.info['avg_precision_' + suffix] = self.info['total_precision_' + suffix] / self.info['total']
+                self.info['avg_recall_' + suffix] = self.info['total_precision_' + suffix] / self.info['total']
                 # info['avg_fmeasure_' + suffix] = info['total_precision_' + suffix] / info['total']
                 
-                del info['total_precision_' + suffix]
-                del info['total_recall_' + suffix]
-                # del info['total_fmeasure_' + suffix]
-        print(info)
+                del self.info['total_precision_' + suffix]
+                del self.info['total_recall_' + suffix]
+                # del self.info['total_fmeasure_' + suffix]
+                
+        print(self.info)
         return
     
     def getSuffix(self, posType, topScorePercentage):
         return posType + '_' + str(topScorePercentage)
 
     def getContributorByDatasetType(self, text, topScorePercentage = 0.2, allWords = False):
-        
-        if(self.params.dataset_name == 'multi_news'):
+        if(self.params.dataset_name in ['multi_news', 'bhot']):
             contributors = []
             textBlocks = text.split('|||||')
             for textBlock in textBlocks:
