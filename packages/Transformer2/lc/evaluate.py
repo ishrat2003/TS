@@ -14,21 +14,21 @@ class Evaluate:
         self.file = self.getFile()
         self.posGroups = {}
         self.posGroups['n'] = ['NN', 'NNP', 'NNS', 'NNPS']
-        # self.posGroups['adj'] = ['JJ', 'JJR', 'JJS']
-        # self.posGroups['nAdj'] = ['NN', 'NNP', 'NNS', 'NNPS', 
-        #                           'JJ', 'JJR', 'JJS']
-        # self.posGroups['v'] = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
-        # self.posGroups['adv'] = ['RB', 'RBR', 'RBS']
-        # self.posGroups['vAdv'] = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ',
-        #                           'RB', 'RBR', 'RBS']
-        # self.posGroups['nAdjAdvV'] = ['NN', 'NNP', 'NNS', 'NNPS', 
-        #                               'JJ', 'JJR', 'JJS',
-        #                               'RB', 'RBR', 'RBS', 
-        #                               'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
-        # self.posGroups['all'] = ["CC","CD","DT","EX","FW","IN","JJ","JJR","JJS","LS","MD",
-        #                          "NN","NNS","NNP","NNPS","PDT","POS","PRP","PRP$","RB","RBR",
-        #                          "RBS","RP","SYM","TO","UH","VB","VBD","VBG","VBN","VBP","VBZ",
-        #                          "WDT","WP","WP$","WRB"]
+        self.posGroups['adj'] = ['JJ', 'JJR', 'JJS']
+        self.posGroups['nAdj'] = ['NN', 'NNP', 'NNS', 'NNPS', 
+                                  'JJ', 'JJR', 'JJS']
+        self.posGroups['v'] = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+        self.posGroups['adv'] = ['RB', 'RBR', 'RBS']
+        self.posGroups['vAdv'] = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ',
+                                  'RB', 'RBR', 'RBS']
+        self.posGroups['nAdjAdvV'] = ['NN', 'NNP', 'NNS', 'NNPS', 
+                                      'JJ', 'JJR', 'JJS',
+                                      'RB', 'RBR', 'RBS', 
+                                      'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+        self.posGroups['all'] = ["CC","CD","DT","EX","FW","IN","JJ","JJR","JJS","LS","MD",
+                                 "NN","NNS","NNP","NNPS","PDT","POS","PRP","PRP$","RB","RBR",
+                                 "RBS","RP","SYM","TO","UH","VB","VBD","VBG","VBN","VBP","VBZ",
+                                 "WDT","WP","WP$","WRB"]
         self.topScorePrecentages = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         return
     
@@ -54,7 +54,7 @@ class Evaluate:
             print('===================================================')
             print(row)
             self.file.write(row)
-            info['total'] += 1
+            self.info['total'] += 1
             
             
         self.summarizeInfo()
@@ -88,11 +88,11 @@ class Evaluate:
                 row['generated_contributor_' + suffix] = generatedContributor
                 row['rouge1_precision_' + suffix] = evaluationScore['rouge1']['precision']
                 row['rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
-                #row['rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
+                row['rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
                 
                 self.info['total_precision_' + suffix] += evaluationScore['rouge1']['precision']
                 self.info['total_recall_' + suffix] += evaluationScore['rouge1']['recall']
-                # info['total_fmeasure_' + suffix] += evaluationScore['rouge1']['fmeasure']
+                self.info['total_fmeasure_' + suffix] += evaluationScore['rouge1']['fmeasure']
                 
         
         return row
@@ -106,7 +106,7 @@ class Evaluate:
                 suffix = self.getSuffix(posType, topScorePercentage)
                 self.info['total_precision_' + suffix] = 0
                 self.info['total_recall_' + suffix] = 0
-                # self.info['total_fmeasure_' + suffix] = 0
+                self.info['total_fmeasure_' + suffix] = 0
                 
         return
     
@@ -115,12 +115,12 @@ class Evaluate:
             for topScorePercentage in self.topScorePrecentages:
                 suffix = self.getSuffix(posType, topScorePercentage)
                 self.info['avg_precision_' + suffix] = self.info['total_precision_' + suffix] / self.info['total']
-                self.info['avg_recall_' + suffix] = self.info['total_precision_' + suffix] / self.info['total']
-                # info['avg_fmeasure_' + suffix] = info['total_precision_' + suffix] / info['total']
+                self.info['avg_recall_' + suffix] = self.info['total_recall_' + suffix] / self.info['total']
+                self.info['avg_fmeasure_' + suffix] = info['total_fmeasure_' + suffix] / info['total']
                 
                 del self.info['total_precision_' + suffix]
                 del self.info['total_recall_' + suffix]
-                # del self.info['total_fmeasure_' + suffix]
+                del self.info['total_fmeasure_' + suffix]
                 
         print(self.info)
         return
