@@ -116,7 +116,7 @@ class Evaluate:
                 suffix = self.getSuffix(posType, topScorePercentage)
                 self.info['avg_precision_' + suffix] = self.info['total_precision_' + suffix] / self.info['total']
                 self.info['avg_recall_' + suffix] = self.info['total_recall_' + suffix] / self.info['total']
-                self.info['avg_fmeasure_' + suffix] = info['total_fmeasure_' + suffix] / info['total']
+                self.info['avg_fmeasure_' + suffix] = self.info['total_fmeasure_' + suffix] / self.info['total']
                 
                 del self.info['total_precision_' + suffix]
                 del self.info['total_recall_' + suffix]
