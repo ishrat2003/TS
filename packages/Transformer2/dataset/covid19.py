@@ -2,18 +2,18 @@ import pathlib
 import tensorflow as tf
 import json
 import lc
+from .base import Base
 
-class Covid19():
+class Covid19(Base):
     
     def __init__(self, path):
-        self.directoryPath = path
-        self.name = 'covid19'
+        super().__init__(path, 'covid19')
         self.allowedPOSTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         self.minCount = 3
         return
 
     def get(self):
-        articlesRoot = tf.keras.utils.get_file(self.directoryPath + '/biorxiv_medrxiv', 
+        articlesRoot = tf.keras.utils.get_file(self.directoryPath + '/covid19/biorxiv_medrxiv', 
             'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-27/biorxiv_medrxiv.tar.gz',
             untar=True)
 

@@ -2,6 +2,7 @@ from time import time
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from .store import Store
+from operator import itemgetter 
 
 class LDA(Store):
 
@@ -132,21 +133,25 @@ class LDA(Store):
 		return
 
 	def predictedTopics(self, words, limit = 5, limitPerTopic = 100):
-		itemTopics = self.intersection(self.getCombinedTopics(limitPerTopic), itemTopics)
+		itemTopics = self.intersection(self.getCombinedTopics(limitPerTopic), words)
 		if not len(itemTopics):
 			return []
 		
-		wordWeights = self.getWordsMaxWeightForTheDominantTopic()
-		sortedWordWeights = wordWeights.argsort()
-		return sortedWordWeights[:limit]
+		wordWeights = self.getWordsMaxWeightForTheDominantTopic(itemTopics)
+		sortedWordWeights = sorted(wordWeights.items(), key = itemgetter(1), reverse = True)
+		return [key for (key, value) in sortedWordWeights[:limit]]
 
-	def getWordsMaxWeightForTheDominantTopic(self):
+	def getWordsMaxWeightForTheDominantTopic(self, itemTopics):
 		wordWeights = {}
-		words = self.getWords()
-		for word in words.keys():
-			sortedTopicIndexes = word.argsort()
-			dominantTopic = sortedTopicIndexes[0]
-			wordWeights[word] = dominantTopic
+		words = self.getWords().tolist()
+
+		for word in itemTopics:
+			if word not in words.keys():
+				continue
+			wordWeights[word] = 0
+			for topicIndex in words[word].keys():
+				if words[word][topicIndex] > wordWeights[word]:
+					wordWeights[word] = words[word][topicIndex]
   
 		del words
 		return wordWeights
@@ -156,6 +161,8 @@ class LDA(Store):
 			return self.combinedTopics
 
 		allTopics = self.getTopics()
+		allTopics = allTopics.tolist()
+
 		self.combinedTopics = []
 		for topicIndex in allTopics.keys():
 			topTopics = allTopics[topicIndex][:limitPerTopic]

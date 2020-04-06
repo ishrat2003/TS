@@ -7,7 +7,7 @@ class PharmaNews():
     
     def __init__(self, path):
         self.directoryPath = path
-        self.name = 'covid19'
+        self.name = 'pharma_news'
         self.allowedPOSTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         self.minCount = 3
         return

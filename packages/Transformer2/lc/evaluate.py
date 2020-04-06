@@ -3,6 +3,7 @@ from .peripheral import Peripheral
 import os
 from utility.file import File
 from datetime import datetime
+from topic.lda import LDA 
 
 class Evaluate:
 
@@ -14,22 +15,23 @@ class Evaluate:
         self.file = self.getFile()
         self.posGroups = {}
         self.posGroups['n'] = ['NN', 'NNP', 'NNS', 'NNPS']
-        self.posGroups['adj'] = ['JJ', 'JJR', 'JJS']
-        self.posGroups['nAdj'] = ['NN', 'NNP', 'NNS', 'NNPS', 
-                                  'JJ', 'JJR', 'JJS']
-        self.posGroups['v'] = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
-        self.posGroups['adv'] = ['RB', 'RBR', 'RBS']
-        self.posGroups['vAdv'] = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ',
-                                  'RB', 'RBR', 'RBS']
-        self.posGroups['nAdjAdvV'] = ['NN', 'NNP', 'NNS', 'NNPS', 
-                                      'JJ', 'JJR', 'JJS',
-                                      'RB', 'RBR', 'RBS', 
-                                      'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
-        self.posGroups['all'] = ["CC","CD","DT","EX","FW","IN","JJ","JJR","JJS","LS","MD",
-                                 "NN","NNS","NNP","NNPS","PDT","POS","PRP","PRP$","RB","RBR",
-                                 "RBS","RP","SYM","TO","UH","VB","VBD","VBG","VBN","VBP","VBZ",
-                                 "WDT","WP","WP$","WRB"]
+        # self.posGroups['adj'] = ['JJ', 'JJR', 'JJS']
+        # self.posGroups['nAdj'] = ['NN', 'NNP', 'NNS', 'NNPS', 
+        #                           'JJ', 'JJR', 'JJS']
+        # self.posGroups['v'] = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+        # self.posGroups['adv'] = ['RB', 'RBR', 'RBS']
+        # self.posGroups['vAdv'] = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ',
+        #                           'RB', 'RBR', 'RBS']
+        # self.posGroups['nAdjAdvV'] = ['NN', 'NNP', 'NNS', 'NNPS', 
+        #                               'JJ', 'JJR', 'JJS',
+        #                               'RB', 'RBR', 'RBS', 
+        #                               'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+        # self.posGroups['all'] = ["CC","CD","DT","EX","FW","IN","JJ","JJR","JJS","LS","MD",
+        #                          "NN","NNS","NNP","NNPS","PDT","POS","PRP","PRP$","RB","RBR",
+        #                          "RBS","RP","SYM","TO","UH","VB","VBD","VBG","VBN","VBP","VBZ",
+        #                          "WDT","WP","WP$","WRB"]
         self.topScorePrecentages = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+        self.lda = LDA(self.dataset, os.path.join(self.params.data_directory, self.params.dataset_name))
         return
     
     def getFile(self):
@@ -44,9 +46,7 @@ class Evaluate:
         return
 
     def process(self, store = True):
-
         self.initInfo()
-                    
         for (batch, (source, target)) in enumerate(self.dataset):
             sourceText = source.numpy().decode('utf-8')
             targetText = target.numpy().decode('utf-8')
@@ -59,6 +59,61 @@ class Evaluate:
             
         self.summarizeInfo()
         return
+    
+    def processTopics(self):
+        self.initInfo()
+        
+        data = self.dataset.get()
+        
+        for item in data:
+            row = self.processItemForTopic(0, item)
+            print('===================================================')
+            print(row)
+            self.file.write(row)
+            self.info['total'] += 1
+            
+            
+        self.summarizeInfo()
+        return
+    
+    def processItemForTopic(self, batch, item):
+        source, _ = item
+        sourceText = self.dataset.getText(source.numpy())
+            
+        seperator = ' '
+        if self.params.display_details:
+            print('Batch:::::::::::::::::: ', batch)
+            print('Content::: ', sourceText)
+        
+        row = {}
+        
+        for posType in self.posGroups:
+            self.setAllowedTypes(self.posGroups[posType])
+            for topScorePercentage in self.topScorePrecentages:
+                generatedContributor = self.getContributor(sourceText, topScorePercentage)
+                
+                expectedContributor = self.getContributor(sourceText, 0, True)
+                expectedContributor = self.lda.predictedTopics(expectedContributor, limit = 5, limitPerTopic = 250)
+                expectedContributor = seperator.join(expectedContributor)
+                
+                if self.params.display_details:
+                    print('LDA dominant topics::: ', expectedContributor)
+                
+                generatedContributor = seperator.join(generatedContributor)
+                evaluationScore = self.rouge.getScore(expectedContributor, generatedContributor)
+                
+                suffix = self.getSuffix(posType, topScorePercentage)
+                row['expected_lda_' + suffix] = expectedContributor
+                row['generated_contributor_' + suffix] = generatedContributor
+                row['rouge1_precision_' + suffix] = evaluationScore['rouge1']['precision']
+                row['rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
+                row['rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
+                
+                self.info['total_precision_' + suffix] += evaluationScore['rouge1']['precision']
+                self.info['total_recall_' + suffix] += evaluationScore['rouge1']['recall']
+                self.info['total_fmeasure_' + suffix] += evaluationScore['rouge1']['fmeasure']
+                
+        return row
     
     def processItem(self, batch, sourceText, targetText):
         seperator = ' '
@@ -94,7 +149,6 @@ class Evaluate:
                 self.info['total_recall_' + suffix] += evaluationScore['rouge1']['recall']
                 self.info['total_fmeasure_' + suffix] += evaluationScore['rouge1']['fmeasure']
                 
-        
         return row
     
     def initInfo(self):

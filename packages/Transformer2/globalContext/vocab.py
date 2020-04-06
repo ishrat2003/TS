@@ -18,15 +18,12 @@ class Vocab(Store):
         self.sequenceIndex = 0
         return
 
-
     def setDatasetPath(self, path):
         self.datasetPath = path
         return
 
-
     def getVocab(self):
         return self.vocab
-
 
     '''
     allOptions = ['NN', 'NNP', 'NNS', 'NNPS', 'JJ', 'JJR', 'JJS' 'RB', 'RBR', 'RBS', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
@@ -34,7 +31,6 @@ class Vocab(Store):
     def setAllowedPosTypes(self, allowedPOSTypes):
         self.allowedPOSTypes = allowedPOSTypes
         return
-
 
     def buildVocab(self):
         self.vocab = {}
@@ -49,14 +45,12 @@ class Vocab(Store):
         print('Finished processing')
         return
 
-
     def getText(self, rawData):
         data = json.loads(rawData.decode("utf-8"))
         abstractText = [paragraph["text"] for paragraph in data["abstract"]]
         bodyText = [paragraph["text"] for paragraph in data["body_text"]]
         text = data["metadata"]["title"] + '. ' + ' '.join(abstractText) + ' '.join(bodyText)
         return { 'text': text}
-
 
     def _load(self):
         self._loadVocab()

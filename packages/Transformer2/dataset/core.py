@@ -7,6 +7,7 @@ from .scientificPapers import ScientificPapers
 from .cnnDailyMail import CNNDailyMail
 from .wikiHow import WikiHow
 from .multiNews import MultiNews
+from .covid19 import Covid19
 
 class Core:
 
@@ -31,6 +32,8 @@ class Core:
             self.dataSetProcessor = WikiHow(self.path)
         elif (self.name == 'multi_news'):
             self.dataSetProcessor = MultiNews(self.path)
+        elif (self.name == 'covid19'):
+            self.dataSetProcessor = Covid19(self.path)
 
         self.dataSetProcessor.setSplitPercentage(percentage)
         self.dataSetProcessor.setTotalItems(total)
