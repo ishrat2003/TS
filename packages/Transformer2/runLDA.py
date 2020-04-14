@@ -1,6 +1,7 @@
 from dataset.core import Core as Dataset
 from topic.lda import LDA
 from params.core import Core as Params
+import os
 
 scriptParams = Params()
 params = scriptParams.get()

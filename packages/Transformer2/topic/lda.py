@@ -3,6 +3,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from .store import Store
 from operator import itemgetter 
+import pickle
+from utility.file import File
+import os
 
 class LDA(Store):
 
@@ -15,7 +18,11 @@ class LDA(Store):
 		self.numberOfTopics = 10
 		self.totalTopFrequencyWords = 1000
 		self.combinedTopics = None
-		self.model = None
+		self.model = self.__getModel()
+		self.vectorizer = self.__getVectorizer()
+		self.processedDocumentsTopics = self.__getDocumentTopics()
+		self.allTopics = self.getTopics()
+		self.documentLabels = [] 
 		return
 
 	def setNumberOfIterations(self, number):
@@ -46,15 +53,20 @@ class LDA(Store):
 
 		documents = []
 		for item in dataset:
-			bagOfWords = self.datasetProcessor.getLCTWordsOccurredMoreThanMinCount(item)
+			itemData, label = item
+			self.documentLabels.append(label.numpy().decode("utf-8"))
+			bagOfWords = self.datasetProcessor.getText(itemData.numpy())
 			documents.append(bagOfWords)
+			# print('---------------------')
+			# print(bagOfWords)
 
 		# max_dff [0.0, 1.0] = When building the vocabulary ignore terms that have a document frequency strictly higher than the given threshold (corpus-specific stop words). 
 		# min_df [0.0, 1.0] = When building the vocabulary ignore terms that have a document frequency strictly lower than the given threshold.
-		tfVectorizer = CountVectorizer(max_df = 0.95, min_df = 2, max_features = self.totalTopFrequencyWords, stop_words='english')
-		tf = tfVectorizer.fit_transform(documents)
-		self.features = tfVectorizer.get_feature_names()
+		self.vectorizer = CountVectorizer(max_df = 1.0, min_df = 2, max_features = self.totalTopFrequencyWords, stop_words='english')
+		tf = self.vectorizer.fit_transform(documents)
+		self.features = self.vectorizer.get_feature_names()
 
+		self.__saveVectorizer(self.vectorizer)
 		del documents # Freeing memory
 		return tf
 
@@ -62,8 +74,12 @@ class LDA(Store):
 		tf = self.getCountVectorizer()
 		self.model = LatentDirichletAllocation(n_components=self.numberOfTopics, max_iter=self.iteration, learning_method='online', learning_offset=1.0,random_state=0).fit(tf)
 
+		self.__saveModel(self.model)
 		words = self.saveWords(self.model)
 		self.saveTopics(words)
+
+		documentTopics = self.model.transform(tf)
+		self.__saveDocumentTopics(documentTopics)
 		return
 
 	def getTopics(self):
@@ -132,13 +148,18 @@ class LDA(Store):
 		print(self.getTopics())
 		return
 
-	def predictedTopics(self, words, limit = 5, limitPerTopic = 100):
+	def predictedTopics(self, words, label, limit = 5, limitPerTopic = 500):
+		print('combined topics    ', self.getCombinedTopics(limitPerTopic))
 		itemTopics = self.intersection(self.getCombinedTopics(limitPerTopic), words)
+		print('itemTopics', itemTopics)
+		#itemTopics = self.intersection(self.getDominantTopicTerms(label), words)
 		if not len(itemTopics):
 			return []
 		
 		wordWeights = self.getWordsMaxWeightForTheDominantTopic(itemTopics)
+		print('wordWeights', wordWeights)
 		sortedWordWeights = sorted(wordWeights.items(), key = itemgetter(1), reverse = True)
+		print('sortedWordWeights', sortedWordWeights)
 		return [key for (key, value) in sortedWordWeights[:limit]]
 
 	def getWordsMaxWeightForTheDominantTopic(self, itemTopics):
@@ -156,12 +177,18 @@ class LDA(Store):
 		del words
 		return wordWeights
 
+	def getDominantTopicTerms(self, label):
+		topicIndex = self.processedDocumentsTopics[label]['dominant_topic_indexes'][0]
+		print(topicIndex)
+		allTopics = self.allTopics.tolist()
+		print(allTopics)
+		return allTopics[topicIndex]
+
 	def getCombinedTopics(self, limitPerTopic):
 		if self.combinedTopics:
 			return self.combinedTopics
-
-		allTopics = self.getTopics()
-		allTopics = allTopics.tolist()
+	
+		allTopics = self.allTopics.tolist()
 
 		self.combinedTopics = []
 		for topicIndex in allTopics.keys():
@@ -172,4 +199,56 @@ class LDA(Store):
 		return self.combinedTopics
 
 	def intersection(self, list1, list2):
-		return list(set(list1) & set(list2)) 
+		return list(set(list1) & set(list2))
+
+	def __saveDocumentTopics(self, documentsTopics):
+		processedDocumentsTopics = {}
+		index = 0
+		for documentTopics in documentsTopics:
+			processedDocumentsTopics[self.documentLabels[index]] = {}
+			processedDocumentsTopics[self.documentLabels[index]]['topic_score'] = documentTopics
+			processedDocumentsTopics[self.documentLabels[index]]['dominant_topic_indexes'] = documentTopics.argsort()
+			index += 1
+			
+		self.__saveInPickel(self.__getDocumentTopicslPath(), processedDocumentsTopics)
+		return
+
+	def __getDocumentTopics(self):
+		return self.__getFromPickel(self.__getDocumentTopicslPath())
+
+	def __getDocumentTopicslPath(self):
+		return self._getFilePath('lda_document_topics.sav', self.path)
+
+	def __saveModel(self, model):
+		self.__saveInPickel(self.__getModelPath(), model)
+		return
+
+	def __getModel(self):
+		return self.__getFromPickel(self.__getModelPath())
+
+	def __getModelPath(self):
+		return self._getFilePath('lda_model.sav', self.path)
+
+	def __saveVectorizer(self, vectorizer):
+		pickle.dump(vectorizer, open(self.__getVectorizerPath(), 'wb'))
+		return
+
+	def __getVectorizer(self):
+		path = self.__getVectorizerPath()
+		return self.__getFromPickel(path)
+
+	def __getVectorizerPath(self):
+		return self._getFilePath('lda_vectorizer.sav', self.path)
+
+	def __getFromPickel(self, filePath):
+		file = File(filePath)
+		if file.exists():
+			return pickle.load(open(filePath, 'rb'));
+		return None
+
+	def __saveInPickel(self, filePath, model):
+		file = File(filePath)
+		if file.exists():
+			file.remove()
+		pickle.dump(model, open(filePath, 'wb'))
+		return

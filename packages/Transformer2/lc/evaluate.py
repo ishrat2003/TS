@@ -37,7 +37,7 @@ class Evaluate:
     def getFile(self):
         now = datetime.now()
         dateString = now.strftime("%Y%m%d_%H%M%S")
-        path = os.path.join(self.params.data_directory, 'cwr', self.params.dataset_name + str(dateString) + '.csv')
+        path = os.path.join(self.params.data_directory, 'cwr', self.params.dataset_name + str(dateString) + 'pos10occ1.csv')
         file = File(path)
         return file
 
@@ -77,9 +77,11 @@ class Evaluate:
         return
     
     def processItemForTopic(self, batch, item):
-        source, _ = item
-        sourceText = self.dataset.getText(source.numpy())
-            
+        source, label = item
+        label = label.numpy().decode("utf-8")
+        sourceRaw = source.numpy()
+        sourceText = self.dataset.getText(sourceRaw)
+
         seperator = ' '
         if self.params.display_details:
             print('Batch:::::::::::::::::: ', batch)
@@ -89,25 +91,45 @@ class Evaluate:
         
         for posType in self.posGroups:
             self.setAllowedTypes(self.posGroups[posType])
+            expectedContributor = self.dataset.getTitle(source.numpy())
+            # print(sourceText)
+            # print(label)
+            totalExpected = len(expectedContributor.split(' '))
+            if totalExpected < 2:
+                totalExpected = 5
+            # print('totalExpected', totalExpected)
+            
+            ldaGeneratedTopics = self.lda.predictedTopics(sourceText.split(' '), label, limit = totalExpected)
+            ldaGeneratedTopics = seperator.join(ldaGeneratedTopics)
+            # print('title', expectedContributor)
+            # print('ldaGeneratedTopics', ldaGeneratedTopics)
+            
+            row['title'] = expectedContributor
+            row['lda'] = ldaGeneratedTopics
+            evaluationScore = self.rouge.getScore(expectedContributor, ldaGeneratedTopics)
+            row['rouge1_precision_lda'] = evaluationScore['rouge1']['precision']
+            row['rouge1_recall_lda'] = evaluationScore['rouge1']['recall']
+            row['rouge1_fmeasure_lda'] = evaluationScore['rouge1']['fmeasure']
+            
+            if self.params.display_details:
+                print('Title topics::: ', expectedContributor)
+                print('LDA topics::: ', ldaGeneratedTopics)
+                
             for topScorePercentage in self.topScorePrecentages:
-                generatedContributor = self.getContributor(sourceText, topScorePercentage)
-                
-                expectedContributor = self.getContributor(sourceText, 0, True)
-                expectedContributor = self.lda.predictedTopics(expectedContributor, limit = 5, limitPerTopic = 250)
-                expectedContributor = seperator.join(expectedContributor)
-                
+                cwrGeneratedContributor = self.getContributor(sourceRaw.decode("utf-8"), topScorePercentage)
+                cwrGeneratedContributor = seperator.join(cwrGeneratedContributor)
+                # print('cwrGeneratedContributor', cwrGeneratedContributor)
                 if self.params.display_details:
-                    print('LDA dominant topics::: ', expectedContributor)
-                
-                generatedContributor = seperator.join(generatedContributor)
-                evaluationScore = self.rouge.getScore(expectedContributor, generatedContributor)
-                
+                    print('CWR topics::: ', cwrGeneratedContributor)
+                    
                 suffix = self.getSuffix(posType, topScorePercentage)
-                row['expected_lda_' + suffix] = expectedContributor
-                row['generated_contributor_' + suffix] = generatedContributor
-                row['rouge1_precision_' + suffix] = evaluationScore['rouge1']['precision']
-                row['rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
-                row['rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
+                row['cwr_' + suffix] = cwrGeneratedContributor
+
+                evaluationScore = self.rouge.getScore(expectedContributor, cwrGeneratedContributor)
+                
+                row['cwr_rouge1_precision_' + suffix] = evaluationScore['rouge1']['precision']
+                row['cwr_rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
+                row['cwr_rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
                 
                 self.info['total_precision_' + suffix] += evaluationScore['rouge1']['precision']
                 self.info['total_recall_' + suffix] += evaluationScore['rouge1']['recall']
@@ -197,9 +219,9 @@ class Evaluate:
 
         peripheralProcessor = Peripheral(text)
         peripheralProcessor.setAllowedPosTypes(self.allowedTypes)
-        peripheralProcessor.setPositionContributingFactor(1)
+        peripheralProcessor.setPositionContributingFactor(10)
         peripheralProcessor.setOccuranceContributingFactor(1)
-        peripheralProcessor.setProperNounContributingFactor(1)
+        peripheralProcessor.setProperNounContributingFactor(0)
         peripheralProcessor.setTopScorePercentage(topScorePercentage)
         peripheralProcessor.setFilterWords(minAllowedScore)
         peripheralProcessor.loadSentences(text)

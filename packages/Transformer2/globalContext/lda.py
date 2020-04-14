@@ -4,11 +4,13 @@ from .vocab import Vocab
 from scipy.sparse import csr_matrix
 import utility
 from sklearn.decomposition import LatentDirichletAllocation
+import pickle
 
 class LDA(Vocab):
 
 	def __init__(self, dataset, path):
 		super().__init__(dataset, path)
+		self.path = path
 		self.iteration = 500
 		self.verbose = 1
 		self.perplexity = 10
@@ -117,7 +119,6 @@ class LDA(Vocab):
 		print("Finished training LDA")
 		return
 
-
 	def _load(self):
 		wordCoOccurenceVector = self.__loadSparseCsr()
 		if wordCoOccurenceVector is not None:
@@ -127,7 +128,7 @@ class LDA(Vocab):
 
 
 	def __saveSparseCsr(self, vectors):
-		filePath = self._getFilePath('word_cooccurence.npz')
+		filePath = self._getFilePath('word_cooccurence.npz', self.path)
 		file = utility.File(filePath)
 		file.remove()
 		np.savez(filePath, data=vectors.data, indices=vectors.indices, indptr=vectors.indptr, shape=vectors.shape)
@@ -162,7 +163,7 @@ class LDA(Vocab):
 
 
 	def __loadSparseCsr(self):
-		filePath = self._getFilePath('word_cooccurence.npz')
+		filePath = self._getFilePath('word_cooccurence.npz', self.path)
 		file = utility.File(filePath)
 		if(not file.exists()):
 			return None
@@ -188,4 +189,25 @@ class LDA(Vocab):
 
 		self.wordCoOccurenceVector = csr_matrix((data, (rows, columns)), shape=(vocabSize, vocabSize))
 		return
+
+
+	def __saveModel(self, model):
+		pickle.dump(model, open(self.__getModelPath(), 'wb'))
+		return
+
+	def __getModel(self, model):
+		return pickle.load(open(self.__getModelPath(), 'rb'));
+
+	def __getModelPath(self):
+		return self._getFilePath('lda_model.sav', self.path)
+
+	def __saveVectorizer(self, model):
+		pickle.dump(model, open(self.__getVectorizerPath(), 'wb'))
+		return
+
+	def __getVectorizer(self, model):
+		return pickle.load(open(self.__getVectorizerPath(), 'rb'));
+
+	def __getVectorizerPath(self):
+		return self._getFilePath('lda_vectorizer.sav', self.path)
 

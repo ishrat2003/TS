@@ -31,11 +31,11 @@ else:
 
     evaluationProcessor = Evaluate(trainingSet, params)
 # allowedTypes = ['NN', 'NNP', 'NNS', 'NNPS']
-#allowedTypes = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
-#allowedTypes = ['JJ', 'JJR', 'JJS']
-#allowedTypes = ['RB', 'RBR', 'RBS']
-#allowedTypes = ["CC","CD","DT","EX","FW","IN","JJ","JJR","JJS","LS","MD","NN","NNS","NNP","NNPS","PDT","POS","PRP","PRP$","RB","RBR","RBS","RP","SYM","TO","UH","VB","VBD","VBG","VBN","VBP","VBZ","WDT","WP","WP$","WRB"]
-#allowedTypes = ['NN', 'NNP', 'NNS', 'NNPS', 'JJ', 'JJR', 'JJS' 'RB', 'RBR', 'RBS', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+# allowedTypes = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+# allowedTypes = ['JJ', 'JJR', 'JJS']
+# allowedTypes = ['RB', 'RBR', 'RBS']
+# allowedTypes = ["CC","CD","DT","EX","FW","IN","JJ","JJR","JJS","LS","MD","NN","NNS","NNP","NNPS","PDT","POS","PRP","PRP$","RB","RBR","RBS","RP","SYM","TO","UH","VB","VBD","VBG","VBN","VBP","VBZ","WDT","WP","WP$","WRB"]
+# allowedTypes = ['NN', 'NNP', 'NNS', 'NNPS', 'JJ', 'JJR', 'JJS' 'RB', 'RBR', 'RBS', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
 # evaluationProcessor.setAllowedTypes(allowedTypes)
 
 if evaluateTopics:

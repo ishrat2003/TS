@@ -5,3 +5,17 @@ doi
 doi.org
 copyright
 biorxiv
+case
+suffix
+text
+title
+tex
+start
+end
+section
+refid
+case
+fig
+assay
+select
+figure

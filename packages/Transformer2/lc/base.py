@@ -108,7 +108,7 @@ class Base():
 					# If more than one word than add as sentence
 					self.sentences.append(currentSentence)
 				currentSentence = []
-			if len(word) < self.minWordSize:
+			if (len(word) < self.minWordSize) or (word in self.stopWords):
 				continue
 			
 			wordKey = self._addWordInfo(word, type)
