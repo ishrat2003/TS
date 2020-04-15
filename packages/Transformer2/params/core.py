@@ -30,6 +30,10 @@ class Core:
     self.parser.add_argument('--checkpoint_directory', default='/content/drive/My Drive/Colab Notebooks/data/checkpoints')
     self.parser.add_argument('--log_directory', default='/content/drive/My Drive/Colab Notebooks/data/logs')
     self.parser.add_argument('--plot_directory', default='/content/drive/My Drive/Colab Notebooks/data/plots')
+    
+    # CWR
+    self.parser.add_argument('--position_contributing_factor', default=1.0, type=float)
+    self.parser.add_argument('--occurance_contributing_factor', default=1.0, type=float)
     return
 
   def get(self):
