@@ -149,17 +149,17 @@ class LDA(Store):
 		return
 
 	def predictedTopics(self, words, label, limit = 5, limitPerTopic = 500):
-		print('combined topics    ', self.getCombinedTopics(limitPerTopic))
+		# print('combined topics    ', self.getCombinedTopics(limitPerTopic))
 		itemTopics = self.intersection(self.getCombinedTopics(limitPerTopic), words)
-		print('itemTopics', itemTopics)
+		# print('itemTopics', itemTopics)
 		#itemTopics = self.intersection(self.getDominantTopicTerms(label), words)
 		if not len(itemTopics):
 			return []
 		
 		wordWeights = self.getWordsMaxWeightForTheDominantTopic(itemTopics)
-		print('wordWeights', wordWeights)
+		# print('wordWeights', wordWeights)
 		sortedWordWeights = sorted(wordWeights.items(), key = itemgetter(1), reverse = True)
-		print('sortedWordWeights', sortedWordWeights)
+		# print('sortedWordWeights', sortedWordWeights)
 		return [key for (key, value) in sortedWordWeights[:limit]]
 
 	def getWordsMaxWeightForTheDominantTopic(self, itemTopics):
@@ -179,9 +179,9 @@ class LDA(Store):
 
 	def getDominantTopicTerms(self, label):
 		topicIndex = self.processedDocumentsTopics[label]['dominant_topic_indexes'][0]
-		print(topicIndex)
+		# print(topicIndex)
 		allTopics = self.allTopics.tolist()
-		print(allTopics)
+		# print(allTopics)
 		return allTopics[topicIndex]
 
 	def getCombinedTopics(self, limitPerTopic):

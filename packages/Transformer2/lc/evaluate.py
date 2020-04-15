@@ -13,6 +13,7 @@ class Evaluate:
         self.allowedTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         self.rouge = Rouge( self.params, ['rouge1'])
         self.file = self.getFile()
+        self.fileAvg = self.getFile('avg')
         self.posGroups = {}
         self.posGroups['n'] = ['NN', 'NNP', 'NNS', 'NNPS']
         # self.posGroups['adj'] = ['JJ', 'JJR', 'JJS']
@@ -34,10 +35,10 @@ class Evaluate:
         self.lda = LDA(self.dataset, os.path.join(self.params.data_directory, self.params.dataset_name))
         return
     
-    def getFile(self):
+    def getFile(self, prefix = ''):
         now = datetime.now()
         dateString = now.strftime("%Y%m%d_%H%M%S")
-        path = os.path.join(self.params.data_directory, 'cwr', self.params.dataset_name + str(dateString) + 'pos10occ1.csv')
+        path = os.path.join(self.params.data_directory, 'cwr', self.params.dataset_name + '_' + prefix + '_' + str(dateString) + '_pos10occ0.csv')
         file = File(path)
         return file
 
@@ -51,8 +52,8 @@ class Evaluate:
             sourceText = source.numpy().decode('utf-8')
             targetText = target.numpy().decode('utf-8')
             row = self.processItem(batch, sourceText, targetText)
-            print('===================================================')
-            print(row)
+            # print('===================================================')
+            # print(row)
             self.file.write(row)
             self.info['total'] += 1
             
@@ -67,10 +68,11 @@ class Evaluate:
         
         for item in data:
             row = self.processItemForTopic(0, item)
-            print('===================================================')
-            print(row)
+            # print('===================================================')
+            # print(row)
             self.file.write(row)
             self.info['total'] += 1
+            print(self.info['total'])
             
             
         self.summarizeInfo()
@@ -110,6 +112,9 @@ class Evaluate:
             row['rouge1_precision_lda'] = evaluationScore['rouge1']['precision']
             row['rouge1_recall_lda'] = evaluationScore['rouge1']['recall']
             row['rouge1_fmeasure_lda'] = evaluationScore['rouge1']['fmeasure']
+            self.info['lda_total_precision'] += evaluationScore['rouge1']['precision']
+            self.info['lda_total_recall'] += evaluationScore['rouge1']['recall']
+            self.info['lda_total_fmeasure'] += evaluationScore['rouge1']['fmeasure']
             
             if self.params.display_details:
                 print('Title topics::: ', expectedContributor)
@@ -131,9 +136,9 @@ class Evaluate:
                 row['cwr_rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
                 row['cwr_rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
                 
-                self.info['total_precision_' + suffix] += evaluationScore['rouge1']['precision']
-                self.info['total_recall_' + suffix] += evaluationScore['rouge1']['recall']
-                self.info['total_fmeasure_' + suffix] += evaluationScore['rouge1']['fmeasure']
+                self.info['total_precision'][suffix] += evaluationScore['rouge1']['precision']
+                self.info['total_recall'][suffix] += evaluationScore['rouge1']['recall']
+                self.info['total_fmeasure'][suffix] += evaluationScore['rouge1']['fmeasure']
                 
         return row
     
@@ -167,38 +172,72 @@ class Evaluate:
                 row['rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
                 row['rouge1_fmeasure_' + suffix] = evaluationScore['rouge1']['fmeasure']
                 
-                self.info['total_precision_' + suffix] += evaluationScore['rouge1']['precision']
-                self.info['total_recall_' + suffix] += evaluationScore['rouge1']['recall']
-                self.info['total_fmeasure_' + suffix] += evaluationScore['rouge1']['fmeasure']
+                self.info['total_precision'][suffix] += evaluationScore['rouge1']['precision']
+                self.info['total_recall'][suffix] += evaluationScore['rouge1']['recall']
+                self.info['total_fmeasure'][suffix] += evaluationScore['rouge1']['fmeasure']
                 
         return row
     
     def initInfo(self):
         self.info = {}
+        self.info['total_precision'] = {}
+        self.info['total_recall'] = {}
+        self.info['total_fmeasure'] = {}
+        self.info['avg_precision'] = {}
+        self.info['avg_recall'] = {}
+        self.info['avg_fmeasure'] = {}
+        self.info['lda_total_precision'] = 0
+        self.info['lda_total_recall'] = 0
+        self.info['lda_total_fmeasure'] = 0
+        self.info['lda_avg_precision'] = 0
+        self.info['lda_avg_recall'] = 0
+        self.info['lda_avg_fmeasure'] = 0
+        self.info['lda_precision'] = 0
+        self.info['lda_recall'] = 0
+        self.info['lda_fmeasure'] = 0
         self.info['total'] = 1
         
         for posType in self.posGroups:
             for topScorePercentage in self.topScorePrecentages:
                 suffix = self.getSuffix(posType, topScorePercentage)
-                self.info['total_precision_' + suffix] = 0
-                self.info['total_recall_' + suffix] = 0
-                self.info['total_fmeasure_' + suffix] = 0
+                self.info['total_precision'][suffix] = 0
+                self.info['total_recall'][suffix] = 0
+                self.info['total_fmeasure'][suffix] = 0
                 
         return
     
     def summarizeInfo(self):
+        self.info['lda_avg_precision'] = self.info['lda_total_precision'] / self.info['total']
+        self.info['lda_avg_recall'] = self.info['lda_total_recall'] / self.info['total']
+        self.info['lda_avg_fmeasure'] = self.info['lda_total_fmeasure'] / self.info['total']
+        
+        del self.info['lda_total_precision']
+        del self.info['lda_total_recall']
+        del self.info['lda_total_fmeasure']
+
         for posType in self.posGroups:
             for topScorePercentage in self.topScorePrecentages:
                 suffix = self.getSuffix(posType, topScorePercentage)
-                self.info['avg_precision_' + suffix] = self.info['total_precision_' + suffix] / self.info['total']
-                self.info['avg_recall_' + suffix] = self.info['total_recall_' + suffix] / self.info['total']
-                self.info['avg_fmeasure_' + suffix] = self.info['total_fmeasure_' + suffix] / self.info['total']
+                self.info['avg_precision'][suffix] = self.info['total_precision'][suffix] / self.info['total']
+                self.info['avg_recall'][suffix] = self.info['total_recall'][suffix] / self.info['total']
+                self.info['avg_fmeasure'][suffix] = self.info['total_fmeasure'][suffix] / self.info['total']
                 
-                del self.info['total_precision_' + suffix]
-                del self.info['total_recall_' + suffix]
-                del self.info['total_fmeasure_' + suffix]
+                del self.info['total_precision'][suffix]
+                del self.info['total_recall'][suffix]
+                del self.info['total_fmeasure'][suffix]
                 
-        print(self.info)
+                row = {}
+                row['suffix'] = suffix
+                row['postype'] = posType
+                row['radious'] = 1.0 - topScorePercentage
+                row['precision'] = self.info['avg_precision'][suffix]
+                row['recall'] = self.info['avg_recall'][suffix]
+                row['fmeasure'] = self.info['avg_fmeasure'][suffix]
+                row['lda_precision'] = self.info['lda_avg_precision']
+                row['lda_recall'] = self.info['lda_avg_recall']
+                row['lda_fmeasure'] = self.info['lda_avg_fmeasure']
+                self.fileAvg.write(row)
+        # print(self.info)
         return
     
     def getSuffix(self, posType, topScorePercentage):
@@ -220,7 +259,7 @@ class Evaluate:
         peripheralProcessor = Peripheral(text)
         peripheralProcessor.setAllowedPosTypes(self.allowedTypes)
         peripheralProcessor.setPositionContributingFactor(10)
-        peripheralProcessor.setOccuranceContributingFactor(1)
+        peripheralProcessor.setOccuranceContributingFactor(0)
         peripheralProcessor.setProperNounContributingFactor(0)
         peripheralProcessor.setTopScorePercentage(topScorePercentage)
         peripheralProcessor.setFilterWords(minAllowedScore)
