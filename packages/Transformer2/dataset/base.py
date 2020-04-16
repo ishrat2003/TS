@@ -31,6 +31,10 @@ class Base:
         self.dlConfig = tfds.download.DownloadConfig(manual_dir=self.directoryPath)
         return self.dataset()
     
+    def getTrainingSet(self):
+        trainingSet, validationSet = self.get()
+        return trainingSet
+    
     def getMetadata(self):
         return self.metadata
     
@@ -45,6 +49,24 @@ class Base:
     
     def getGenerator(self, trainingSet, type = 'source'):
         return None
+    
+    def getText(self, rawData):
+        text, summary = rawData
+        return text.numpy().decode('utf-8')
+    
+    def getAbstract(self, rawData):
+        text, summary = rawData
+        return summary.numpy().decode('utf-8')
+    
+    def getTitle(self, rawData):
+        return self.getAbstract(rawData)
+    
+    def getLabel(self, rawData):
+        return 'Todo'
+    
+    def getAbstract(self, rawData):
+        text, summary = rawData
+        return summary.numpy()
     
     def _load(self, key): 
         if self.totalItems:

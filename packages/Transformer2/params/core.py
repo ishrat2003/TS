@@ -34,6 +34,7 @@ class Core:
     # CWR
     self.parser.add_argument('--position_contributing_factor', default=1.0, type=float)
     self.parser.add_argument('--occurance_contributing_factor', default=1.0, type=float)
+    self.parser.add_argument('--type', default='title', help="title|summary|lda")
     return
 
   def get(self):

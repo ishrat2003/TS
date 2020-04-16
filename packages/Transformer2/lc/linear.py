@@ -1,10 +1,10 @@
-from . import K3S
+from . import CWR
 import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.pylab import rcParams
 
-class Linear(K3S):
+class Linear(CWR):
     
     
     def __init__(self, text, filterRate = 0.2):

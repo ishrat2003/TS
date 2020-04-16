@@ -10,11 +10,12 @@ class BasicEvaluate:
         self.params = params
         self.allowedTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         self.rouge = Rouge( self.params, ['rouge1'])
-        self.file = self.getFile()
-        self.fileSummary = self.getFile('summary')
         self.topScorePrecentages = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         self.positionContributingFactor = params.position_contributing_factor
         self.occuranceContributingFactor = params.occurance_contributing_factor
+        self.file = self.getFile()
+        self.fileSummary = self.getFile('summary')
+        self.setDefaultPOSGroups()
         return
     
     def setDefaultPOSGroups(self):
@@ -56,43 +57,23 @@ class BasicEvaluate:
         self.allowedTypes = allowedTypes
         return
 
-    def process(self, store = True):
+    def process(self):
         self.initInfo()
-        
-        for (batch, (source, target)) in enumerate(self.dataset):
-            sourceText = source.numpy().decode('utf-8')
-            targetText = target.numpy().decode('utf-8')
-            row = self.processItem(batch, sourceText, targetText)
+
+        data = self.dataset.getTrainingSet()
+
+        for item in data:
+            row = self.processItem(0, item)
             self.file.write(row)
+            print(self.info['total'])
             self.info['total'] += 1
-            
+
         self.summarizeInfo()
         return
     
  
     def processItem(self, batch, sourceText, targetText):
-        seperator = ' '
-        if self.params.display_details:
-            print('Batch:::::::::::::::::: ', batch)
-            print('Content::: ', sourceText)
-            print('Summary::: ', targetText)
-        
-        row = {}
-        
-        for posType in self.posGroups:
-            self.setAllowedTypes(self.posGroups[posType])
-            for topScorePercentage in self.topScorePrecentages:
-            
-                generatedContributor = self.getContributorByDatasetType(sourceText, topScorePercentage)
-                expectedContributor = self.getContributor(targetText, 0, True)
-                
-                generatedContributor = seperator.join(generatedContributor)
-                expectedContributor = seperator.join(expectedContributor)
-                
-                values = self.evaluate(generatedContributor, expectedContributor, posType, topScorePercentage)
-                row.update(values)
-                   
-        return row
+        return {}
     
     def evaluate(self, generatedContributor, expectedContributor, posType, topScorePercentage):
         if self.params.display_details:
@@ -101,7 +82,7 @@ class BasicEvaluate:
         row = {}
         evaluationScore = self.rouge.getScore(expectedContributor, generatedContributor)      
         suffix = self.getSuffix(posType, topScorePercentage)
-        row['expected_summary'] = expectedContributor
+        row['expected'] = expectedContributor
         row['generated_contributor_' + suffix] = generatedContributor
         row['rouge1_precision_' + suffix] = evaluationScore['rouge1']['precision']
         row['rouge1_recall_' + suffix] = evaluationScore['rouge1']['recall']
@@ -157,7 +138,16 @@ class BasicEvaluate:
     def getSuffix(self, posType, topScorePercentage):
         return posType + '_' + str(topScorePercentage)
 
-    def getContributor(self, text, topScorePercentage = 0.2, allWords = False):
+    def getContributor(self, peripheralProcessor, topScorePercentage, allWords = False):
+        if allWords:
+            featuredWords = peripheralProcessor.getFilteredWords()
+            return list(featuredWords.keys())
+
+        peripheralProcessor.setTopScorePercentage(topScorePercentage)
+        peripheralProcessor.getPoints()
+        return peripheralProcessor.getContrinutors()
+    
+    def getPeripheralProcessor(self, text, allWords = False):
         minAllowedScore = 0 if allWords else 0.1
 
         peripheralProcessor = Peripheral(text)
@@ -165,14 +155,9 @@ class BasicEvaluate:
         peripheralProcessor.setPositionContributingFactor(self.positionContributingFactor)
         peripheralProcessor.setOccuranceContributingFactor(self.occuranceContributingFactor)
         peripheralProcessor.setProperNounContributingFactor(0)
-        peripheralProcessor.setTopScorePercentage(topScorePercentage)
         peripheralProcessor.setFilterWords(minAllowedScore)
         peripheralProcessor.loadSentences(text)
         peripheralProcessor.loadFilteredWords()
         peripheralProcessor.train()
-        if allWords:
-            featuredWords = peripheralProcessor.getFilteredWords()
-            return list(featuredWords.keys())
-
-        peripheralProcessor.getPoints()
-        return peripheralProcessor.getContrinutors()
+        
+        return peripheralProcessor

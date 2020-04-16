@@ -1,7 +1,7 @@
 name = 'lc'
 
 from .base import Base
-from .k3s import K3S
+from .cwr import CWR
 from .peripheral import Peripheral
 from .tsne import TSNELC
 from .linear import Linear

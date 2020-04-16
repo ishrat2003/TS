@@ -157,6 +157,7 @@ class Base():
 		minTopWordScores = self.maxScore * self.topScorePercentage
 
 		points = []
+		self.contributors = []
 		for word in self.filteredWords:
 			point = {}
 			point['x'] = self._getX(word)
@@ -164,7 +165,7 @@ class Base():
 			point['color'] = 'green'
 			point['label'] = self.filteredWords[word]['pure_word']
 			point['type'] = self.filteredWords[word]['type']
-
+			
 			if self.isTopic(word, minTopWordScores):
 				point['color'] = 'red'
 				self.contributors.append(word)

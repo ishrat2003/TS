@@ -34,6 +34,8 @@ class Core:
             self.dataSetProcessor = MultiNews(self.path)
         elif (self.name == 'covid19'):
             self.dataSetProcessor = Covid19(self.path)
+        else:
+            return None
 
         self.dataSetProcessor.setSplitPercentage(percentage)
         self.dataSetProcessor.setTotalItems(total)

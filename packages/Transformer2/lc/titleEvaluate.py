@@ -2,7 +2,7 @@ from .basicEvaluate import BasicEvaluate
 from .peripheral import Peripheral
 
 class TitleEvaluate(BasicEvaluate):
-
+    
     def getFileName(self, prefix = ''):
         return self.params.dataset_name + '_' + prefix + '_title_pos' + str(self.positionContributingFactor) + '_occ' + str(self.occuranceContributingFactor) + '.csv';
 
@@ -10,25 +10,9 @@ class TitleEvaluate(BasicEvaluate):
         self.allowedTypes = allowedTypes
         return
     
-    def process(self):
-        self.initInfo()
-        
-        data = self.dataset.get()
-        
-        for item in data:
-            row = self.processItemForTopic(0, item)
-            self.file.write(row)
-            self.info['total'] += 1
-            print(self.info['total'])
-            
-        self.summarizeInfo()
-        return
-    
-    def processItemForTopic(self, batch, item):
-        source, label = item
-        label = label.numpy().decode("utf-8")
-        sourceRaw = source.numpy()
-        sourceText = self.dataset.getText(sourceRaw)
+    def processItem(self, batch, item):
+        label = self.dataset.getLabel(item)
+        sourceText = self.dataset.getText(item)
 
         seperator = ' '
         if self.params.display_details:
@@ -39,13 +23,14 @@ class TitleEvaluate(BasicEvaluate):
         
         for posType in self.posGroups:
             self.setAllowedTypes(self.posGroups[posType])
-            expectedContributor = self.dataset.getTitle(source.numpy())
-            row['title'] = expectedContributor
+            expectedContributor = self.dataset.getTitle(item)
             if self.params.display_details:
                 print('Title topics::: ', expectedContributor)
+
+            peripheralProcessor = self.getPeripheralProcessor(sourceText)
                 
             for topScorePercentage in self.topScorePrecentages:
-                cwrGeneratedContributor = self.getContributor(sourceRaw.decode("utf-8"), topScorePercentage)
+                cwrGeneratedContributor = self.getContributor(peripheralProcessor, topScorePercentage)
                 cwrGeneratedContributor = seperator.join(cwrGeneratedContributor)
                 values = self.evaluate(cwrGeneratedContributor, expectedContributor, posType, topScorePercentage)
                 row.update(values)

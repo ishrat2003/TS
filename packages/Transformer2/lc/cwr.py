@@ -4,7 +4,7 @@ from nltk.stem.porter import PorterStemmer
 import utility
 from . import Base
 
-class K3S(Base):
+class CWR(Base):
 
 
 	def __init__(self, text, filterRate = 0.2):

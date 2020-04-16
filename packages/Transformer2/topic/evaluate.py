@@ -27,7 +27,7 @@ class Evaluate:
         self.initInfo()
         data = self.dataset.get()
         for item in data:
-            row = self.processItemForTopic(0, item)
+            row = self.processItem(0, item)
             self.file.write(row)
             self.info['total'] += 1
             print(self.info['total'])
@@ -35,7 +35,7 @@ class Evaluate:
         self.summarizeInfo()
         return
     
-    def processItemForTopic(self, batch, item):
+    def processItem(self, batch, item):
         source, label = item
         label = label.numpy().decode("utf-8")
         sourceRaw = source.numpy()

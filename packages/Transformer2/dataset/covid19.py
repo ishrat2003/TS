@@ -42,6 +42,12 @@ class Covid19(Base):
         dataset = filePaths.map(read)
         return dataset
     
+    def getTrainingSet(self):
+        dataset = self.get()
+        if self.totalItems:
+            return dataset.take(self.totalItems)
+        return dataset
+    
     def getText(self, rawData, withTitle = False):
         data = self.__getData(rawData)
         abstractText = [paragraph["text"] for paragraph in data["abstract"]]
@@ -59,27 +65,15 @@ class Covid19(Base):
         data = self.__getData(rawData)
         return self.__getProcessedText(data["metadata"]["abstract"])
     
-    # def getLCTWordsOccurredMoreThanMinCount(self, item):
-    #     itemData, _ = item
-    #     text = self.getText(itemData.numpy())
-        
-    #     lcProcessor = lc.Peripheral(text, 0)
-    #     lcProcessor.setAllowedPosTypes(self.allowedPOSTypes)
-    #     lcProcessor.setFilterWords(0)
-    #     lcProcessor.train()
-        
-    #     localWords = lcProcessor.getWordInfo()
-    #     words = []
-        
-    #     for word in localWords:
-    #         if localWords[word]['count'] <= self.minCount:
-    #             continue
-    #         words.append(localWords[word]['stemmed_word'])
-   
-    #     return ' '.join(words)
+    def getLabel(self, rawData):
+        source, label = rawData
+        return label.numpy().decode("utf-8")
     
     def __getData(self, rawData):
-        return json.loads(rawData.decode("utf-8"))
+        source, label = rawData
+        label = label.numpy().decode("utf-8")
+        sourceRaw = source.numpy()
+        return json.loads(sourceRaw.decode("utf-8"))
 
     def __getProcessedText(self, text):
         words = word_tokenize(self.__clean(text))

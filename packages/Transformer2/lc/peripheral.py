@@ -1,7 +1,7 @@
-from . import K3S
+from . import CWR
 import numpy
 
-class Peripheral(K3S):
+class Peripheral(CWR):
 
 
 	def __init__(self, text, filterRate = 0.2):
