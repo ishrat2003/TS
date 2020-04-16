@@ -1,5 +1,8 @@
 import os
 import tensorflow_datasets as tfds
+import utility
+from nltk import word_tokenize, pos_tag
+from nltk.stem.porter import PorterStemmer
 
 class Base:
     
@@ -10,6 +13,8 @@ class Base:
         self.splitPercentage = 100
         self.metadata = None
         self.supervised = supervised
+        self.allowedPOSTypes = ['NN', 'NNP', 'NNS', 'NNPS']
+        self.stopWords = utility.Utility.getStopWords()
         
         if name:
             self.path = os.path.join(path, self.name)
@@ -67,6 +72,22 @@ class Base:
     def getAbstract(self, rawData):
         text, summary = rawData
         return summary.numpy()
+    
+    def getProcessedText(self, text):
+        words = word_tokenize(self.__clean(text))
+        allWords = pos_tag(words)
+        processedWords = []
+
+        for itemWord in allWords:
+            (word, type) = itemWord
+            if (type not in self.allowedPOSTypes) or (word in self.stopWords):
+                continue
+
+            word = self.__cleanWord(word)
+            word = self.stemmer.stem(word.lower())
+            processedWords.append(word)
+
+        return ' '.join(processedWords)
     
     def _load(self, key): 
         if self.totalItems:

@@ -8,6 +8,7 @@ from .cnnDailyMail import CNNDailyMail
 from .wikiHow import WikiHow
 from .multiNews import MultiNews
 from .covid19 import Covid19
+from .pharmaNews import PharmaNews
 
 class Core:
 
@@ -34,6 +35,8 @@ class Core:
             self.dataSetProcessor = MultiNews(self.path)
         elif (self.name == 'covid19'):
             self.dataSetProcessor = Covid19(self.path)
+        elif (self.name == 'pharma_news'):
+            self.dataSetProcessor = PharmaNews(self.path)
         else:
             return None
 

@@ -23,7 +23,10 @@ class TitleEvaluate(BasicEvaluate):
         
         for posType in self.posGroups:
             self.setAllowedTypes(self.posGroups[posType])
+            
             expectedContributor = self.dataset.getTitle(item)
+            expectedContributor = self.dataset.getProcessedText(expectedContributor)
+            
             if self.params.display_details:
                 print('Title topics::: ', expectedContributor)
 

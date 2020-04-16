@@ -38,7 +38,8 @@ class SummaryEvaluate(BasicEvaluate):
             
                 generatedContributor = self.getContributor(peripheralProcessor, topScorePercentage)
                 expectedContributor = self.getContributor(peripheralProcessor, 0, True)
-                
+                expectedContributor = self.dataset.getProcessedText(expectedContributor)
+            
                 generatedContributor = seperator.join(generatedContributor)
                 expectedContributor = seperator.join(expectedContributor)
                 

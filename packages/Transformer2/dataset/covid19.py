@@ -48,22 +48,20 @@ class Covid19(Base):
             return dataset.take(self.totalItems)
         return dataset
     
-    def getText(self, rawData, withTitle = False):
+    def getText(self, rawData):
         data = self.__getData(rawData)
         abstractText = [paragraph["text"] for paragraph in data["abstract"]]
         bodyText = [paragraph["text"] for paragraph in data["body_text"]]
         text = ' '.join(abstractText) + ' '.join(bodyText)
-        if withTitle:
-            text = data["metadata"]["title"] + '. ' + text
-        return self.__getProcessedText(text)
+        return text
     
     def getTitle(self, rawData):
         data = self.__getData(rawData)
-        return self.__getProcessedText(data["metadata"]["title"])
+        return data["metadata"]["title"]
     
     def getAbstract(self, rawData):
         data = self.__getData(rawData)
-        return self.__getProcessedText(data["metadata"]["abstract"])
+        return data["metadata"]["abstract"]
     
     def getLabel(self, rawData):
         source, label = rawData
@@ -71,11 +69,10 @@ class Covid19(Base):
     
     def __getData(self, rawData):
         source, label = rawData
-        label = label.numpy().decode("utf-8")
         sourceRaw = source.numpy()
         return json.loads(sourceRaw.decode("utf-8"))
 
-    def __getProcessedText(self, text):
+    def getProcessedText(self, text):
         words = word_tokenize(self.__clean(text))
         allWords = pos_tag(words)
         processedWords = []

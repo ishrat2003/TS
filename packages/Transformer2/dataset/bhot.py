@@ -1,9 +1,9 @@
 from .baseCsv import BaseCsv
 
-class PharmaNews(BaseCsv):
+class BHOT(BaseCsv):
     
     def __init__(self, path):
-        super().__init__(path, 'pharma_news')
+        super().__init__(path, 'bhot')
         self.allowedPOSTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         return
 

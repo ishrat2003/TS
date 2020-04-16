@@ -13,9 +13,8 @@ scriptParams = Params()
 params = scriptParams.get()
 scriptParams.save(params.data_directory)
 
-logging.info("# 2. Preprocessing sequences")
+logging.info("# 2. Preprocessing data")
 logging.info("# ================================")
-logging.info("# 2.1. Loading raw dataset (" + str(params.dataset_percentage) + "%)")
 
 dataset = Dataset(params.dataset_name, params.data_directory)
 datasetToProcess = dataset.get(float(params.dataset_percentage), int(params.total_items))
@@ -29,6 +28,10 @@ if params.type == 'title':
 else:
     evaluationProcessor = SummaryEvaluate(datasetToProcess, params)
     
+logging.info("# 3. Evaluating")
+logging.info("# ================================")
+
 evaluationProcessor.process()
 
+logging.info("# 4. Finished")
 
