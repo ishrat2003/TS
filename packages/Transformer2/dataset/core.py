@@ -9,6 +9,8 @@ from .wikiHow import WikiHow
 from .multiNews import MultiNews
 from .covid19 import Covid19
 from .pharmaNews import PharmaNews
+from .bhot import BHOT
+from .brexit import Brexit
 
 class Core:
 
@@ -37,6 +39,10 @@ class Core:
             self.dataSetProcessor = Covid19(self.path)
         elif (self.name == 'pharma_news'):
             self.dataSetProcessor = PharmaNews(self.path)
+        elif (self.name == 'bhot'):
+            self.dataSetProcessor = BHOT(self.path)
+        elif (self.name == 'brexit'):
+            self.dataSetProcessor = Brexit(self.path)
         else:
             return None
 

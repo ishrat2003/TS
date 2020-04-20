@@ -16,7 +16,6 @@ class Covid19(Base):
         self.allowedPOSTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         self.minCount = 3
         self.stopWords = utility.Utility.getStopWords()
-        self.stemmer = PorterStemmer()
         return
     
     def setAllowedPosTypes(self, allowedPOSTypes):
@@ -82,14 +81,12 @@ class Covid19(Base):
             if (type not in self.allowedPOSTypes):
                 continue
 
-            word = self.__cleanWord(word)
+            word = self._cleanWord(word)
             word = self.stemmer.stem(word.lower())
             processedWords.append(word)
 
         return ' '.join(processedWords)
 
-    def __cleanWord(self, word):
-        return re.sub('[^a-zA-Z0-9]+', '', word)
     
     def __clean(self, text):
         text = re.sub('<.+?>', '. ', text)

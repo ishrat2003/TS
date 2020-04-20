@@ -4,7 +4,6 @@ from sklearn.manifold import TSNE
 
 class TSNELC(Base):
 
-
 	def __init__(self, text, filterRate = 0.2):
 		super().__init__(text, filterRate)
 		self.loadSentences(text)

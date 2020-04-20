@@ -3,6 +3,9 @@ import tensorflow_datasets as tfds
 import utility
 from nltk import word_tokenize, pos_tag
 from nltk.stem.porter import PorterStemmer
+import re, sys, numpy
+from nltk import word_tokenize, pos_tag
+from nltk.stem.porter import PorterStemmer
 
 class Base:
     
@@ -15,7 +18,7 @@ class Base:
         self.supervised = supervised
         self.allowedPOSTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         self.stopWords = utility.Utility.getStopWords()
-        
+        self.stemmer = PorterStemmer()
         if name:
             self.path = os.path.join(path, self.name)
         else:
@@ -74,7 +77,7 @@ class Base:
         return summary.numpy()
     
     def getProcessedText(self, text):
-        words = word_tokenize(self.__clean(text))
+        words = word_tokenize(text)
         allWords = pos_tag(words)
         processedWords = []
 
@@ -83,11 +86,14 @@ class Base:
             if (type not in self.allowedPOSTypes) or (word in self.stopWords):
                 continue
 
-            word = self.__cleanWord(word)
+            word = self._cleanWord(word)
             word = self.stemmer.stem(word.lower())
             processedWords.append(word)
 
         return ' '.join(processedWords)
+    
+    def _cleanWord(self, word):
+        return re.sub('[^a-zA-Z0-9]+', '', word)
     
     def _load(self, key): 
         if self.totalItems:

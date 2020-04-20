@@ -12,3 +12,4 @@ from .multiNews import MultiNews
 from .covid19 import Covid19
 from .pharmaNews import PharmaNews
 from .bhot import BHOT
+from .brexit import Brexit
