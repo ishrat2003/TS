@@ -1,6 +1,7 @@
 import numpy
 from . import Base
 from sklearn.manifold import TSNE
+import io, os
 
 class TSNELC(Base):
 
@@ -34,7 +35,7 @@ class TSNELC(Base):
 		return
 
 
-	def getWordCoOccurenceVectors(self):
+	def getWordCoOccurenceVectors(self, path = None):
 		vocabSize = len(self.wordInfo)
 		vectors = numpy.zeros((vocabSize, vocabSize))
 		
@@ -52,11 +53,30 @@ class TSNELC(Base):
 					word2Index = self.wordInfo[word2]['index']
 					vectors[word1Index][word2Index] += 1
 
+		if path:
+			self.saveVectorAndMeta(path, vectors)
+			
 		return vectors
 
-
-	def train(self):
-		vectors = self.getWordCoOccurenceVectors()
+	def saveVectorAndMeta(self, path, vectors):
+		outV = io.open(os.path.join(path, 'vecs.tsv'), 'w', encoding='utf-8')
+		outM = io.open(os.path.join(path, 'meta.tsv'), 'w', encoding='utf-8')
+		outM.write("word\tcategory\n")
+		
+		for word in self.filteredWords.keys():
+			vec = vectors[self.filteredWords[word]['index']]
+			outV.write('\t'.join([str(x) for x in vec]) + "\n")
+			category = "green"
+			if self.isTopic(word, None):
+				category = "red"
+			outM.write(self.filteredWords[word]['pure_word'] + "\t"  + category + "\n")	
+		outV.close()
+		outM.close()
+		print('Word vector saved')
+		return
+     
+	def train(self, path = None):
+		vectors = self.getWordCoOccurenceVectors(path)
 		tsne = TSNE(perplexity = self.perplexity, 
 			n_components = self.numberOfComponents, 
 			init = 'pca', 

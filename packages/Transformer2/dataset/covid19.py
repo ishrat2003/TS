@@ -39,6 +39,7 @@ class Covid19(Base):
             return tf.io.read_file(path), label
         
         dataset = filePaths.map(read)
+        dataset.shuffle(20000, reshuffle_each_iteration=False).repeat(1)
         return dataset
     
     def getTrainingSet(self):
@@ -60,7 +61,7 @@ class Covid19(Base):
     
     def getAbstract(self, rawData):
         data = self.__getData(rawData)
-        return data["metadata"]["abstract"]
+        return data["abstract"]
     
     def getLabel(self, rawData):
         source, label = rawData
