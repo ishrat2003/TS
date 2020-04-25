@@ -28,7 +28,7 @@ class Word():
                 'number_of_blocks': 1,
                 'topic': self.getTopic(label),
                 'sentiment': self.getSentiment(label),
-                'stemmed': stemmedWord
+                'stemmed_word': stemmedWord
             }
             return self.vocab[stemmedWord]['index']
         
@@ -61,11 +61,11 @@ class Word():
         return
     
     def saveVocab(self):
-        self.__saveInPickel(self.__getVocabPath(), self.vocab)
+        self._saveInPickel(self._getVocabPath(), self.vocab)
         return
     
     def loadVocab(self):
-        self.vocab = self.__getFromPickel(self.__getVocabPath())
+        self.vocab = self._getFromPickel(self._getVocabPath())
         return self.vocab
     
     def getFile(self, prefix = ''):
@@ -73,16 +73,19 @@ class Word():
         file = utility.File(path)
         return file
     
-    def __getVocabPath(self):
+    def _getFilePath(self, fileName, path):
+        return utility.File.join(path, fileName)
+    
+    def _getVocabPath(self):
     	return self._getFilePath('meta_vocab.sav', self.path)
 
-    def __getFromPickel(self, filePath):
+    def _getFromPickel(self, filePath):
         file = utility.File(filePath)
         if file.exists():
             return pickle.load(open(filePath, 'rb'));
         return None
 
-    def __saveInPickel(self, filePath, model):
+    def _saveInPickel(self, filePath, model):
         file = utility.File(filePath)
         if file.exists():
             file.remove()

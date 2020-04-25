@@ -19,7 +19,7 @@ class Meta(Words):
         return
     
     def process(self):
-        data = self.datasetProcessor.getTrainingSet().take(2)
+        data = self.datasetProcessor.getTrainingSet()
 
         for item in data:
             sourceText = self.datasetProcessor.getText(item)
@@ -29,7 +29,6 @@ class Meta(Words):
             
         for word in self.vocab.keys():
             self.metaFile.write(self.vocab[word])
-            
             
         self.sortVocab()
         self.saveVocab()
@@ -56,12 +55,12 @@ class Meta(Words):
         return processedWords
     
     def saveDocLcs(self):
-        self.__saveInPickel(self.__getDocLcsPath(), self.docsLCFile)
+        self._saveInPickel(self._getDocLcsPath(), self.docsLCFile)
         return
     
     def loadDocLcs(self):
-        self.docsLCFile = self.__getFromPickel(self.__getDocLcsPath())
+        self.docsLCFile = self._getFromPickel(self._getDocLcsPath())
         return self.docsLCFile
 
-    def __getDocLcsPath(self):
+    def _getDocLcsPath(self):
     	return self._getFilePath('docs_lcs.sav', self.path)
