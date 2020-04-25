@@ -39,6 +39,9 @@ class Base:
         self.dlConfig = tfds.download.DownloadConfig(manual_dir=self.directoryPath)
         return self.dataset()
     
+    def getPath(self):
+        return self.path
+    
     def getTrainingSet(self):
         trainingSet, validationSet = self.get()
         return trainingSet
@@ -75,6 +78,9 @@ class Base:
     def getAbstract(self, rawData):
         text, summary = rawData
         return summary.numpy()
+    
+    def getPath(self):
+        return self.path
     
     def getProcessedText(self, text):
         words = word_tokenize(text)

@@ -1,29 +1,32 @@
-import os, sys
+import os
 import lc
 import operator
 import utility
 import numpy
 from .store import Store
 import datetime
-import json
 
 class Vocab(Store):
-
-    def __init__(self, dataset, path):
-        super().__init__(dataset, path)
+    
+    def __init__(self, datasetProcessor):
+        super().__init__(datasetProcessor)
         self.vocab = {}
         self.index = 0
         self.allowedPOSTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         self.processedSentences = []
+        self._load()
         self.sequenceIndex = 0
         return
 
+    
     def setDatasetPath(self, path):
         self.datasetPath = path
         return
 
+
     def getVocab(self):
         return self.vocab
+
 
     '''
     allOptions = ['NN', 'NNP', 'NNS', 'NNPS', 'JJ', 'JJR', 'JJS' 'RB', 'RBR', 'RBS', 'VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
@@ -32,12 +35,14 @@ class Vocab(Store):
         self.allowedPOSTypes = allowedPOSTypes
         return
 
-    def buildVocab(self):
-        self.vocab = {}
-        for item in self.dataset:
-            rawData, _ = item
-            self.__processText(self.getText(rawData.numpy()))
 
+    def buildVocab(self):
+        self.datasetProcessor.resetFileIndex()
+        details = self.datasetProcessor.getNextTextBlockDetails('all')
+        while details:
+            self.__processText(details)
+            details = self.datasetProcessor.getNextTextBlockDetails()
+        
         self.__sort()
         self._save()
         print('Total vocab: ', len(self.vocab))
@@ -45,29 +50,20 @@ class Vocab(Store):
         print('Finished processing')
         return
 
-    def getText(self, rawData):
-        data = json.loads(rawData.decode("utf-8"))
-        abstractText = [paragraph["text"] for paragraph in data["abstract"]]
-        bodyText = [paragraph["text"] for paragraph in data["body_text"]]
-        text = data["metadata"]["title"] + '. ' + ' '.join(abstractText) + ' '.join(bodyText)
-        return { 'text': text}
 
     def _load(self):
-        self._loadVocab()
-        self._loadSentences()
+        self.__loadVocab()
+        self.__loadSentences()
         return
 
 
     def _save(self):
         self._saveNumpy('vocab.npz', list(self.vocab.values()))
-        # self._saveNumpy('sentences.npz', list(self.processedSentences))
+        self._saveNumpy('sentences.npz', list(self.processedSentences))
         return
 
 
-    def _loadVocab(self):
-        if not hasattr(self, 'vocab'):
-            self.vocab = {}
-        
+    def __loadVocab(self):
         vocabFiles = self._loadNumpy('vocab.npz')
 
         if vocabFiles is not None:
@@ -77,48 +73,40 @@ class Vocab(Store):
                     for word in vocabData:
                         stemmedWord = word['stemmed_word']
                         self.vocab[stemmedWord] = word
-
+        
         return
 
 
-    def _loadSentences(self):
+    def __loadSentences(self):
+        sentenceFiles = self._loadNumpy('sentences.npz')
         self.processedSentences = []
-        for item in self.dataset:
-            rawData, _ = item
-            sentences = self.__processText(self.getText(rawData.numpy()))
-            self.__addToSentence(sentences)
-            
-        # sentenceFiles = self._loadNumpy('sentences.npz')
-        # self.processedSentences = []
-        # if sentenceFiles is not None:
-        #     for fileRef in sentenceFiles:
-        #         sentenceData = sentenceFiles[fileRef]
-        #         if sentenceData is not None:
-        #             for sentence in sentenceData:
-        #                 self.processedSentences.append(sentence)
+        if sentenceFiles is not None:
+            for fileRef in sentenceFiles:
+                sentenceData = sentenceFiles[fileRef]
+                if sentenceData is not None:
+                    for sentence in sentenceData:
+                        self.processedSentences.append(sentence)
         return
 
 
     def __processText(self, details):
-        lcProcessor = self.__getLCProcessor(details)
-
-        localWords = lcProcessor.getWordInfo()
-        self.__addToVocab(localWords, details)
-
-        return lcProcessor.getSentences()
-    
-    def __getLCProcessor(self, details):
         text = details['text']
         lcProcessor = lc.Peripheral(text, 0)
         lcProcessor.setAllowedPosTypes(self.allowedPOSTypes)
         lcProcessor.setPositionContributingFactor(1)
         lcProcessor.setOccuranceContributingFactor(1)
         lcProcessor.setProperNounContributingFactor(1)
-        lcProcessor.setTopScorePercentage(0.2)
-        lcProcessor.setFilterWords(0.2)
+        lcProcessor.setTopScorePercentage(0.5)
+        lcProcessor.setFilterWords(0.5)
         lcProcessor.train()
         lcProcessor.loadFilteredWords()
-        return lcProcessor
+
+        localWords = lcProcessor.getWordInfo()
+        self.__addToVocab(localWords, details)
+
+        localSentences = lcProcessor.getSentences()
+        self.__addToSentence(localSentences)
+        return
 
 
     def __addToSentence(self, sentences):
@@ -131,10 +119,9 @@ class Vocab(Store):
             for word in sentence:
                 if word not in currentKeys:
                     continue
-                wordDetails = self.vocab[word]
-                if 'sort_index' in wordDetails.keys():
-                    processedSentence.append(wordDetails['sort_index'])
-                    
+                
+                processedSentence.append(self.vocab[word]['index'])
+
             if len(processedSentence) > 1:
                 self.processedSentences.append(processedSentence)
         return
@@ -146,7 +133,6 @@ class Vocab(Store):
         else:
             # Counting lines
             self.sequenceIndex += 1 
-        
         totalWords = len(words)
         if not words:
             return
@@ -161,25 +147,20 @@ class Vocab(Store):
                 wordDetails['total_count'] = words[word]['count']
                 wordDetails['label'] = words[word]['pure_word']
                 wordDetails['stemmed_word'] = words[word]['stemmed_word']
-            else:
-                wordDetails = self.vocab[word]
-            
-            if 'score' in currentWordKeys:
-                wordDetails['score'] = words[word]['score']
-            else:
-                wordDetails['score'] = 0
-            
-            if 'appeared' not in currentWordKeys:
-                wordDetails['appeared'] = self.sequenceIndex
+                if 'score' in currentWordKeys:
+                    wordDetails['score'] = words[word]['score']
+                else:
+                    wordDetails['score'] = 0
+                if 'appeared' not in currentWordKeys:
+                    wordDetails['appeared'] = self.sequenceIndex
                 wordDetails['index'] = currentVocabLength
                 currentVocabLength += 1
             else:
                 wordDetails = self.vocab[word]
                 wordDetails['number_of_blocks'] += 1
                 wordDetails['total_count'] += words[word]['count']
-                
-            if 'score' in currentWordKeys:
-                wordDetails['score'] += words[word]['score']
+                if 'score' in currentWordKeys:
+                    wordDetails['score'] += words[word]['score']
 
             self.vocab[word] = wordDetails
         return
@@ -188,19 +169,13 @@ class Vocab(Store):
     def __sort(self, attribute = 'number_of_blocks'):
         if len(self.vocab) == 0:
             return
-        print('vocab length before sorting: ', len(self.vocab))
+        
         sortedVocab = {}
-        index = 0
         for value in sorted(self.vocab.values(), key=operator.itemgetter(attribute), reverse=True):
-            if value['total_count'] == 1:
-                continue
-            value['sort_index'] = index
             sortedVocab[value['stemmed_word']] = value
-            index += 1
-            print(value)
 
         self.vocab = sortedVocab
-        print('vocab length before sorting: ', len(self.vocab))
         return
 
 
+        

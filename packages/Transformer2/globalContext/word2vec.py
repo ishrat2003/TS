@@ -195,7 +195,7 @@ class Word2Vec(LDA):
                     print(similar_str)
                     
             finalEmbeddings = tfs.run(normalizedEmbeddings)
-            path = self.dataset.getDatasetPath()
+            path = self.datasetProcessor.getDatasetPath()
             filePath = utility.File.join(path, 'model.ckpt')
             save_path = saver.save(tfs, filePath)
             print('Saving model in ', save_path)

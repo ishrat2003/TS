@@ -4,8 +4,8 @@ import numpy
 class Peripheral(K3S):
 
 
-    def __init__(self, dataset, path):
-        super().__init__(dataset, path)
+    def __init__(self, datasetProcessor):
+        super().__init__(datasetProcessor)
         self.totalAngle = 360
         self.startAngle = 0
         return

@@ -8,7 +8,8 @@ from nltk import word_tokenize, pos_tag
 from nltk.stem.porter import PorterStemmer
 import utility
 from datetime import datetime
-
+import tensorflow_datasets as tfds
+ 
 class Covid19(Base):
     
     def __init__(self, path):
@@ -36,7 +37,8 @@ class Covid19(Base):
         
         def read(path):
             label = tf.strings.split(path, '/')[-1]
-            return tf.io.read_file(path), label
+            data = tf.io.read_file(path)
+            return data, label
         
         dataset = filePaths.map(read)
         dataset.shuffle(20000, reshuffle_each_iteration=False).repeat(1)

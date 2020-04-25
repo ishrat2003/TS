@@ -20,7 +20,7 @@ else:
     lda = LDA(dataProcessor, os.path.join(params.data_directory, params.dataset_name))
     lda.setNumberOfTopics(5)
     lda.setPerplexity(5)
-    lda.setNumberOfTopics(5)
+    lda.setNumberOfTopics(6)
     lda.setNumberOfTotalTopFrequencyWord(1000)
     lda.setNumberOfIterations(1000)
     lda.train()

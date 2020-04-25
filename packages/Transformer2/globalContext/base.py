@@ -1,26 +1,16 @@
 import numpy as np
 import utility
 
-# save np.load
-np_load_old = np.load
-
-# modify the default parameters of np.load
-np.load = lambda *a,**k: np_load_old(*a, allow_pickle=True, **k)
-
-class Store():    
+class Base:
     
-
-    def __init__(self, dataset, path):
-        self.dataset = dataset
-        self.path = path
+    def __init__(self, datasetProcessor):
+        self.datasetProcessor = datasetProcessor
         self.prefix = ''
         return
-
 
     def setPrefix(self, prefix):
         self.prefix = prefix
         return
-
 
     def _loadNumpy(self, fileName):
         filePath = self._getFilePath(fileName)
@@ -30,7 +20,6 @@ class Store():
 
         return np.load(filePath)
 
-
     def _saveNumpy(self, fileName, data):
         filePath = self._getFilePath(fileName)
         file = utility.File(filePath)
@@ -38,7 +27,7 @@ class Store():
         np.savez(filePath, data)
         return
 
-
     def _getFilePath(self, fileName):
         fileName = self.prefix + fileName
-        return utility.File.join(self.path, fileName)
+        path = self.datasetProcessor.getPath()
+        return utility.File.join(path, fileName)

@@ -44,6 +44,19 @@ class Utility():
 
 		return Utility.union(stopWords, customStopWords)
 
+	@staticmethod
+	def getPositiveWords():
+		path = File.join(os.path.abspath(__file__ + "/../"), 'positive.txt')
+		file = File(path)
+		stopWords = re.split('[\n]', file.read())
+		return stopWords
+
+	@staticmethod
+	def getNegativeWords():
+		path = File.join(os.path.abspath(__file__ + "/../"), 'negative.txt')
+		file = File(path)
+		stopWords = re.split('[\n]', file.read())
+		return stopWords
 
 	@staticmethod
 	def implode(terms, divider = ','):

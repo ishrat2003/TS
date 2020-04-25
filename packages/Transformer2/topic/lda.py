@@ -55,7 +55,7 @@ class LDA(Store):
 		for item in dataset:
 			itemData, label = item
 			self.documentLabels.append(label.numpy().decode("utf-8"))
-			bagOfWords = self.datasetProcessor.getText(itemData.numpy())
+			bagOfWords = self.datasetProcessor.getText(item)
 			documents.append(bagOfWords)
 			# print('---------------------')
 			# print(bagOfWords)
@@ -83,7 +83,7 @@ class LDA(Store):
 		return
 
 	def getTopics(self):
-		return self.getFileContent('topics-lda.npz')
+		return self.__getFromPickel(self.__getTopicslPath())
 
 	def getWords(self):
 		return self.getFileContent('words-lda.npz')
@@ -108,7 +108,7 @@ class LDA(Store):
 			if dominantTopicIndex:
 				topics[dominantTopicIndex].append(stemmedWord)
 
-		self.save(topics, 'topics-lda.npz')
+		self.__saveInPickel(self.__getTopicslPath(), topics)
 		self.topics = topics
 		return
 
@@ -218,6 +218,9 @@ class LDA(Store):
 
 	def __getDocumentTopicslPath(self):
 		return self._getFilePath('lda_document_topics.sav', self.path)
+
+	def __getTopicslPath(self):
+    		return self._getFilePath('topics-lda.sav', self.path)
 
 	def __saveModel(self, model):
 		self.__saveInPickel(self.__getModelPath(), model)

@@ -4,8 +4,8 @@ import time
 class Linear(K3S):
 
 
-    def __init__(self, dataset, path):
-        super().__init__(dataset, path)
+    def __init__(self, datasetProcessor):
+        super().__init__(datasetProcessor)
         self.startX = 0
         self.now = time.time()
         return
