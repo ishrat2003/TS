@@ -9,13 +9,6 @@ class Meta(Words):
         super().__init__(datasetProcessor)
         self.metaFile = self.getFile('meta')
         self.docsLCFile = []
-        self.lc = LC.Peripheral('')
-        self.lc.setAllowedPosTypes(['NN', 'NNP', 'NNS', 'NNPS'])
-        self.lc.setPositionContributingFactor(5)
-        self.lc.setOccuranceContributingFactor(0)
-        self.lc.setProperNounContributingFactor(0)
-        self.lc.setTopScorePercentage(0.3)
-        self.lc.setFilterWords(0)
         return
     
     def process(self):
@@ -26,16 +19,25 @@ class Meta(Words):
             words = self.getLC(sourceText)
             indices = self.appendWords(words)
             self.docsLCFile.append(indices)
-            
+
+        self.sortVocab() 
         for word in self.vocab.keys():
             self.metaFile.write(self.vocab[word])
             
-        self.sortVocab()
+        
         self.saveVocab()
         self.saveDocLcs()
         return
 
     def getLC(self, text):
+        self.lc = LC.Peripheral('')
+        self.lc.setAllowedPosTypes(['NN', 'NNP', 'NNS', 'NNPS'])
+        self.lc.setPositionContributingFactor(5)
+        self.lc.setOccuranceContributingFactor(0)
+        self.lc.setProperNounContributingFactor(0)
+        self.lc.setTopScorePercentage(0.2)
+        self.lc.setFilterWords(0)
+
         self.lc.loadSentences(text)
         self.lc.loadFilteredWords()
         self.lc.train()
@@ -50,7 +52,7 @@ class Meta(Words):
         
         for item in contributors:
             if item in words.keys():
-                processedWords[item] = words[item]['pure_word']
+                processedWords[item] = words[item]
                 
         return processedWords
     

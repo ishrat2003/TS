@@ -15,7 +15,7 @@ class Plotter():
         return
 
 
-    def displayPlot(self):
+    def displayPlot(self, path):
         #rcParams['figure.figsize']=15,10
         mpl.rcParams.update({'font.size': 22})
         points = self.getPoints()
@@ -32,7 +32,7 @@ class Plotter():
                 textcoords='offset points', 
                 ha='right', 
                 va='bottom')
-        
+        plt.savefig(path)
         plt.show()
         return
 
@@ -40,13 +40,23 @@ class Plotter():
     def getPoints(self):
         if not len(self.wordInfo):
             return None
-
+        
+        topicColors = {}
+        colorIndex = 0
+        
         points = []
         for word in self.wordInfo:
+            if word['topic'] in topicColors.keys():
+                color = topicColors[word['topic']]
+            else:
+                color = self.colors[colorIndex]
+                topicColors[word['topic']] = color
+                colorIndex += 1
+                
             point = {}
             point['x'] = word['x']
             point['y'] = word['y']
-            point['color'] = self.colors[word['topic']]
+            point['color'] = color
             point['label'] = word['label']
             points.append(point)
 

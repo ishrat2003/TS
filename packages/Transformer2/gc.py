@@ -1,49 +1,45 @@
-from packages.gc.vocab import Vocab
-vocabProcessor = Vocab(dataProcessor)
-if train:
-    vocabProcessor.buildVocab()
+import corpus
+import os, logging, sys
+from params.core import Core as Params
+from dataset.core import Core as Dataset
 
-from packages.gc.peripheral import Peripheral
-peripheralProcessor = Peripheral(dataProcessor)
+logging.basicConfig(level=logging.INFO)
+
+logging.info("# This script produces the CWR of GC of the given corpus  ")
+logging.info("# 1. Loading script params ")
+logging.info("# ================================")
+scriptParams = Params()
+params = scriptParams.get()
+scriptParams.save(params.data_directory)
+
+logging.info("# 2. Preprocessing data")
+logging.info("# ================================")
+
+dataset = Dataset(params.dataset_name, params.data_directory)
+datasetToProcess = dataset.get(float(params.dataset_percentage), int(params.total_items))
+
+if not datasetToProcess:
+    logging.error('No dataset found')
+    sys.exit()
+
+# logging.info("# 3. Generating points")
+# logging.info("# ================================")
+# cwrProcessor = corpus.CWR(datasetToProcess, params)
+# points = cwrProcessor.process()
+# logging.info('Total points: ', len(points))
+             
+# logging.info("# 4. Display points")
+# logging.info("# ================================")
+# imageDirectory = os.path.join(params.plot_directory, params.dataset_name)
+# plotter = corpus.Plotter(points)
+# plotter.displayPlot(os.path.join(imageDirectory, 'cwr_gc_plot.png'))
+
+logging.info("# 5. Generating word co-occurance")
+logging.info("# ================================")
+
+wcoProcessor = corpus.WordCooccurance(datasetToProcess, params)
+wcoProcessor.process()
+
+print('Finished')
 
 
-# Display top 50 points (all topics)
-peripheralProcessor.setTotalAngle(360)
-peripheralProcessor.setStartAngle(0)
-wordInfo = peripheralProcessor.getPoints(50)
-plotProcessor = Plotter(wordInfo)
-plotProcessor.displayPlot()
-
-peripheralProcessor.setStartAngle(0)
-peripheralProcessor.setTotalAngle(360 / 10)
-
-numberOfWords = 15
-peripheralProcessor.setTopicFilter(1)
-wordInfo = peripheralProcessor.getPoints(numberOfWords)
-
-peripheralProcessor.setTopicFilter(2)
-wordInfo += peripheralProcessor.getPoints(numberOfWords)
-
-peripheralProcessor.setTopicFilter(3)
-wordInfo += peripheralProcessor.getPoints(numberOfWords)
-
-peripheralProcessor.setTopicFilter(4)
-wordInfo += peripheralProcessor.getPoints(numberOfWords)
-
-peripheralProcessor.setTopicFilter(5)
-wordInfo += peripheralProcessor.getPoints(numberOfWords)
-
-peripheralProcessor.setTopicFilter(6)
-wordInfo += peripheralProcessor.getPoints(numberOfWords)
-
-peripheralProcessor.setTopicFilter(7)
-wordInfo += peripheralProcessor.getPoints(numberOfWords)
-
-peripheralProcessor.setTopicFilter(8)
-wordInfo += peripheralProcessor.getPoints(numberOfWords)
-
-peripheralProcessor.setTopicFilter(9)
-wordInfo += peripheralProcessor.getPoints(numberOfWords)
-
-plotProcessor = Plotter(wordInfo)
-plotProcessor.displayPlot()

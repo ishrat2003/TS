@@ -3,8 +3,9 @@ from topic.lda import LDA
 import os
 import pickle
 import operator
+from .writer import Writer
 
-class Word():
+class Word(Writer):
     
     def __init__(self, datasetProcessor):
         self.datasetProcessor = datasetProcessor
@@ -20,19 +21,21 @@ class Word():
     def getVocab(self):
         return self.vocab
     
-    def appendWord(self, stemmedWord, label):
+    def appendWord(self, stemmedWord, details):
         if stemmedWord not in self.vocab.keys():
             self.vocab[stemmedWord] = {
                 'index': len(self.vocab) + 1,
-                'label': label,
+                'label': details['pure_word'],
+                'count': details['count'],
                 'number_of_blocks': 1,
-                'topic': self.getTopic(label),
-                'sentiment': self.getSentiment(label),
+                'topic': self.getTopic(details['pure_word']),
+                'sentiment': self.getSentiment(details['pure_word']),
                 'stemmed_word': stemmedWord
             }
             return self.vocab[stemmedWord]['index']
         
         self.vocab[stemmedWord]['number_of_blocks'] += 1
+        self.vocab[stemmedWord]['count'] += details['count']
         return self.vocab[stemmedWord]['index']
     
     def getTopic(self, label):
@@ -73,21 +76,6 @@ class Word():
         file = utility.File(path)
         return file
     
-    def _getFilePath(self, fileName, path):
-        return utility.File.join(path, fileName)
-    
     def _getVocabPath(self):
     	return self._getFilePath('meta_vocab.sav', self.path)
 
-    def _getFromPickel(self, filePath):
-        file = utility.File(filePath)
-        if file.exists():
-            return pickle.load(open(filePath, 'rb'));
-        return None
-
-    def _saveInPickel(self, filePath, model):
-        file = utility.File(filePath)
-        if file.exists():
-            file.remove()
-        pickle.dump(model, open(filePath, 'wb'))
-        return

@@ -10,7 +10,7 @@ import sys
 class File():
 
 	
-	def __init__(self, path):
+	def __init__(self, path, writeHeader = True):
 		parts = path.split('/')
 		self.path = path
 		self.fileName = parts[len(parts) - 1]
@@ -21,7 +21,7 @@ class File():
 		self.file = None
 		self.lines = None
 		self.lineNumber = 0
-		self.writeHeader = True
+		self.writeHeader = writeHeader
 
 		#self.index = 0
 		return
