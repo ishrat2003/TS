@@ -1,6 +1,7 @@
 from .meta import Meta
 from .visualization import Visualization
 import numpy
+import utility
 
 class CWR(Visualization):
     
@@ -36,6 +37,7 @@ class CWR(Visualization):
         self.setMaximumRadius()
         
         self.points = []
+        self.pointsFile = self.getFile('cwr_gc.csv')
         
         for topic in topics:
             if self.topicFilter and (topic != self.topicFilter):
@@ -46,8 +48,6 @@ class CWR(Visualization):
         return self.points
     
     def appendPoints(self, words, topic):
-        self.pointsFile = self.getFile('cwr_gc.csv')
-        
         totalWords = len(words)
         thetaIncrement = self.anglePerTopic / totalWords
         currentTheta = self.startAngle
@@ -63,7 +63,7 @@ class CWR(Visualization):
             self.points.append(point)
             self.pointsFile.write(point)
 
-        return points
+        return
     
     def setMaximumRadius(self):
         for word in self.vocab.keys():
@@ -77,8 +77,48 @@ class CWR(Visualization):
         return
     
     def loadPoints(self):
-        self.points = self._getPointsPath(self._getDocLcsPath())
+        self.points = self._getPointsPath(self._getPointsPath())
         return self.points
+    
+    def generateTopicFiles(self):
+        topics = list(self.filteredWordsByTopic.keys())
+        self.removeCategorizedFiles(topics)
+        topicFiles = self.getCategorizedFiles(topics)
+        for topic in topics:
+            points = self.filteredWordsByTopic[topic]
+            for point in points:
+               topicFiles[topic].write(point) 
+        return
+    
+    def generateSentimentFiles (self):
+        sentiments = ["normal", "positive", "negative"]
+        self.removeCategorizedFiles(sentiments)
+        
+        sentimentFiles = self.getCategorizedFiles(sentiments)
+        for point in self.points:
+            fileKey = point['sentiment']
+            sentimentFiles[fileKey].write(point)
+        return
+    
+    def getCategorizedFiles(self, keys):
+        files = {}
+        for key in keys:
+            files[key] = self.getFile( key + '_cwr_gc.csv')
+        return files
+    
+    def removeCategorizedFiles(self, keys):
+        files = self.getCategorizedFiles(keys)
+        for key in keys:
+            files[key].remove()
+        return
+    
+    def remove(self):
+        file = utility.File(self._getPointsPath())
+        file.remove()
+        csvFile = self.getFile('cwr_gc.csv')
+        file.remove()
+        return
 
     def _getPointsPath(self):
     	return self._getFilePath('cwr_gc_pk.sav', self.path)
+

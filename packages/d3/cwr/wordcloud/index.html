@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<head>
+    <title>Cwr</title>
+    <style>
+        .axis {
+            display: none;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
+</head>
+
+<body>
+    <h1>Word Cloud Representation of GC</h1>
+    <ol>
+        <li><a href="/cwr/index.html">Home</a></li>
+        <li><a href="/cwr/wordcloud/index.html">Word Cloud</a></li>
+        <li><a href="/cwr/sunblust/index.html">Sunblust</a></li>
+        <li><a href="/cwr/scatter/index.html">Scatter Plot</a></li>
+    </ol>
+    <div id="block1">
+    <div id="block2">
+    </div>
+    <script>
+
+        var margin = {top: 40, right: 40, bottom: 40, left: 20},
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        function display(data, container){
+            var categories = d3.keys(d3.nest().key(function(d) { return d.topic; }).map(data));
+            var color = d3.scale.ordinal().range(["#C733FF","#339CFF","#9FFF33","#ECFF33","#FFC133", "#FF4C33"]);
+            var fontSize = d3.scale.pow().exponent(5).domain([0,1]).range([10,80]);
+            var layout = d3.layout.cloud()
+                .timeInterval(10)
+                .size([width, height])
+                .words(data)
+                .rotate(function(d) { return 0; })
+                .font('monospace')
+                .fontSize(function(d,i) { return fontSize(d.number_of_blocks/50); })
+                .text(function(d) { return d.label; })
+                .spiral("archimedean")
+                .on("end", draw)
+                .start();
+
+            var svg = d3.select(container).append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var wordcloud = svg.append("g")
+                .attr('class','wordcloud')
+                .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
+
+            var x0 = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1)
+                .domain(categories);
+
+            var xAxis = d3.svg.axis()
+                .scale(x0)
+                .orient("bottom");
+
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll('text')
+                .style('font-size','20px')
+                .style('fill',function(d) { return color(d); })
+                .style('font','sans-serif');
+
+            function draw(words) {
+                wordcloud.selectAll("text")
+                    .data(words)
+                    .enter().append("text")
+                    .attr('class','word')
+                    .style("font-size", function(d) { return d.size + "px"; })
+                    .style("font-family", function(d) { return d.font; })
+                    .style("fill", function(d) { 
+                        var paringObject = data.filter(function(obj) { return true});
+                        return color(paringObject[0].topic); 
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
+                    .text(function(d) { return d.label; });
+            };
+        }
+
+        d3.csv("http://localhost:8080/cwr/data/covid19/metavocab.csv", function(error, data) {
+            display(data, '#block1')
+        });
+
+        d3.csv("http://localhost:8080/cwr/data/covid19/metavocab.csv", function(error, data) {
+            var categories = d3.keys(d3.nest().key(function(d) { return d.topic; }).map(data));
+            var color = d3.scale.ordinal().range(["#C733FF","#339CFF","#9FFF33","#ECFF33","#FFC133", "#FF4C33"]);
+            var fontSize = d3.scale.pow().exponent(5).domain([0,1]).range([10,80]);
+            var layout = d3.layout.cloud()
+                .timeInterval(10)
+                .size([width, height])
+                .words(data)
+                .rotate(function(d) { return 0; })
+                .font('monospace')
+                .fontSize(function(d,i) { return fontSize(d.number_of_blocks/50); })
+                .text(function(d) { return d.label; })
+                .spiral("archimedean")
+                .on("end", draw)
+                .start();
+
+            var svg = d3.select('#block2').append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var wordcloud = svg.append("g")
+                .attr('class','wordcloud')
+                .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
+
+            var x0 = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1)
+                .domain(categories);
+
+            var xAxis = d3.svg.axis()
+                .scale(x0)
+                .orient("bottom");
+
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll('text')
+                .style('font-size','20px')
+                .style('fill',function(d) { return color(d); })
+                .style('font','sans-serif');
+
+            function draw(words) {
+                wordcloud.selectAll("text")
+                    .data(words)
+                    .enter().append("text")
+                    .attr('class','word')
+                    .style("font-size", function(d) { return d.size + "px"; })
+                    .style("font-family", function(d) { return d.font; })
+                    .style("fill", function(d) { 
+                        var paringObject = data.filter(function(obj) { return true});
+                        return color(paringObject[0].topic); 
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
+                    .text(function(d) { return d.label; });
+            };
+        });
+    </script>
+</body>

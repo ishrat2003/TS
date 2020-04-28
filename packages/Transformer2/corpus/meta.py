@@ -2,6 +2,7 @@
 import lc as LC
 from .words import Words
 import operator
+import utility
 
 class Meta(Words):
     
@@ -63,6 +64,15 @@ class Meta(Words):
     def loadDocLcs(self):
         self.docsLCFile = self._getFromPickel(self._getDocLcsPath())
         return self.docsLCFile
+    
+    def remove(self):
+        super().remove()
+        file = utility.File(self._getDocLcsPath())
+        file.remove()
+        csvFile = self.getFile('cwr_gc.csv')
+        csvFile.remove()
+        self.metaFile.remove()
+        return
 
     def _getDocLcsPath(self):
     	return self._getFilePath('docs_lcs.sav', self.path)

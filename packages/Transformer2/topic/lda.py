@@ -83,7 +83,7 @@ class LDA(Store):
 		return
 
 	def getTopics(self):
-		return self.__getFromPickel(self.__getTopicslPath())
+		return self.__getFromPickel(self.__getTopicsPath())
 
 	def getWords(self):
 		return self.getFileContent('words-lda.npz')
@@ -108,7 +108,7 @@ class LDA(Store):
 			if dominantTopicIndex:
 				topics[dominantTopicIndex].append(stemmedWord)
 
-		self.__saveInPickel(self.__getTopicslPath(), topics)
+		self.__saveInPickel(self.__getTopicsPath(), topics)
 		self.topics = topics
 		return
 
@@ -201,6 +201,20 @@ class LDA(Store):
 	def intersection(self, list1, list2):
 		return list(set(list1) & set(list2))
 
+	def remove(self):
+		file = File(self.__getTopicsPath())
+		file.remove()
+
+		file = File(self.__getDocumentTopicsPath())
+		file.remove()
+  
+		file = File(self.__getModelPath())
+		file.remove()
+  
+		file = File(self.__getVectorizerPath())
+		file.remove()
+		return
+
 	def __saveDocumentTopics(self, documentsTopics):
 		processedDocumentsTopics = {}
 		index = 0
@@ -210,16 +224,16 @@ class LDA(Store):
 			processedDocumentsTopics[self.documentLabels[index]]['dominant_topic_indexes'] = documentTopics.argsort()
 			index += 1
 			
-		self.__saveInPickel(self.__getDocumentTopicslPath(), processedDocumentsTopics)
+		self.__saveInPickel(self.__getDocumentTopicsPath(), processedDocumentsTopics)
 		return
 
 	def __getDocumentTopics(self):
-		return self.__getFromPickel(self.__getDocumentTopicslPath())
+		return self.__getFromPickel(self.__getDocumentTopicsPath())
 
-	def __getDocumentTopicslPath(self):
+	def __getDocumentTopicsPath(self):
 		return self._getFilePath('lda_document_topics.sav', self.path)
 
-	def __getTopicslPath(self):
+	def __getTopicsPath(self):
     		return self._getFilePath('topics-lda.sav', self.path)
 
 	def __saveModel(self, model):

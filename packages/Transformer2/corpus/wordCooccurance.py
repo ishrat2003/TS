@@ -2,6 +2,7 @@ from .meta import Meta
 from .visualization import Visualization
 import numpy
 import io, os
+import utility
 
 class WordCooccurance(Visualization):
     
@@ -66,4 +67,11 @@ class WordCooccurance(Visualization):
         outV.close()
         outM.close()
         print('Word vector saved')
+        return
+    
+    def remove(self):
+        file = utility.File(os.path.join(self.path, 'embedding_vecs.tsv'))
+        file.remove()
+        file = utility.File(os.path.join(self.path, 'embedding_meta.tsv'))
+        file.remove()
         return

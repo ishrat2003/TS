@@ -8,3 +8,4 @@ from .writer import Writer
 from .visualization import Visualization
 from .plotter import Plotter
 from .wordCooccurance import WordCooccurance
+from .hierarchy import Hierarchy

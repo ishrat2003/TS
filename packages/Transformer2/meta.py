@@ -26,6 +26,7 @@ if not datasetToProcess:
 data = datasetToProcess.getTrainingSet()
 
 metaManager = Meta(datasetToProcess)
+metaManager.remove()
 metaManager.process()
 print('Finished')
 

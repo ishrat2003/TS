@@ -10,7 +10,7 @@ scriptParams.save(params.data_directory)
 
 dataset = Dataset(params.dataset_name, params.data_directory)
 
-dataProcessor = dataset.get(float(params.dataset_percentage), int(params.total_items))
+dataProcessor = dataset.get()
 if params.type == 'lda':
     print(":::::::::::::: Evaluating ::::::::::::::")
     evaluationProcessor = Evaluate(dataProcessor, params)
@@ -18,10 +18,11 @@ if params.type == 'lda':
 else:
     print(":::::::::::::: Train ::::::::::::::")
     lda = LDA(dataProcessor, os.path.join(params.data_directory, params.dataset_name))
+    lda.remove()
     lda.setNumberOfTopics(5)
     lda.setPerplexity(5)
     lda.setNumberOfTopics(6)
-    lda.setNumberOfTotalTopFrequencyWord(1000)
+    lda.setNumberOfTotalTopFrequencyWord(10000)
     lda.setNumberOfIterations(1000)
     lda.train()
     lda.printTopics()

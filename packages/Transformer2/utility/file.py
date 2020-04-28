@@ -8,7 +8,6 @@ from shutil import copyfile
 import sys
 
 class File():
-
 	
 	def __init__(self, path, writeHeader = True):
 		parts = path.split('/')
@@ -47,7 +46,7 @@ class File():
 
 	def remove(self):
 		if self.exists():
-			os.remove(self.path)
+			os.unlink(self.path)
 		return
 
 

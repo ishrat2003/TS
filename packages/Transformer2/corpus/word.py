@@ -39,11 +39,12 @@ class Word(Writer):
         return self.vocab[stemmedWord]['index']
     
     def getTopic(self, label):
+        lastIndex = len(self.topics) + 1
         for topicIndex in self.topics:
             if label in self.topics[topicIndex]:
                 return 'Topic ' + str(topicIndex)
         
-        return "Others"
+        return "Topic " + str(lastIndex)
     
     def getSentiment(self, label):
         if label in self.positiveWords:
@@ -75,6 +76,11 @@ class Word(Writer):
         path = os.path.join(self.path, prefix + 'vocab.csv')
         file = utility.File(path)
         return file
+    
+    def remove(self):
+        file = utility.File(self._getVocabPath())
+        file.remove()
+        return
     
     def _getVocabPath(self):
     	return self._getFilePath('meta_vocab.sav', self.path)

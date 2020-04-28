@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
-.x.axis path {
+.axis path {
   display: none;
 }
-
 </style>
 <body>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
 <script>
@@ -17,11 +16,12 @@ var margin = {top: 20, right: 20, bottom: 40, left: 20},
     height = 500 - margin.top - margin.bottom;
 
 d3.csv("wordcountData.csv", function(error, data) {
-
+console.log(data);
   var categories = d3.keys(d3.nest().key(function(d) { return d.category; }).map(data));
+  console.log(categories);
   var color = d3.scale.ordinal().range(["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854"]);
   var fontSize = d3.scale.pow().exponent(5).domain([0,1]).range([10,80]);
-console.log(data);
+
   var layout = d3.layout.cloud()
       .timeInterval(10)
       .size([width, height])
