@@ -12,94 +12,145 @@ class Hierarchy(Visualization):
         
         meta = Meta(self.datasetProcessor)
         self.docsLCs = meta.loadDocLcs()
+        self.wordCoOccurance = self.getCoOccurrence()
+        self.totalZones = 5
+        self.max = {}
+        self.max['points'] = 0
+        self.points = {}
+        self.topics = []
+        self.topicWordIds = {}
+        self.processedIndexes = []
+        self.data = []
+        return
+    
+    def setTotalZones(self, totalZones):
+        self.totalZones = totalZones
         return
 
     def process(self, minNumberOfDocsAppeared = 5):
         if not len(self.vocab):
             return
+        
         self.remove()
-        words = self.setFilteredWordsByTopics(minNumberOfDocsAppeared)
-        self.data = self.prepareData()
+        self.preparePoints()
+        
+        self.data = {'name': 'Hierarchy'}
+        self.data['children'] = self.getTopics()
+        self.data['size'] = len(self.data['children'])
+        
         self.save()
+        print(self.data)
         return self.data
     
-    def prepareData(self, zones = 5):
-        self.wordCoOccurance = self.getCoOccurrence()
-        self.data = {
-            "name": "cwr"
-        }
+    def getTopics(self):
+        topics = []
+        for topic in self.topics:
+            topicItem = {}
+            topicItem['name'] = topic
+            topicItem['size'] = len(self.topicWordIds[topic])
+            topicItem['children'] = self.getTopicItem(self.topicWordIds[topic], self.max[topic], topic)
+            topics.append(topicItem)
+        
+        return topics
+    
+    def getTopicItem(self, wordIds, max, topic):
         children = []
-        for topic in self.filteredWordsByTopic.keys():
-            self.setMinMax(self.filteredWordsByTopic[topic])
-            self.gap = (self.max - self.min) / zones
-            start = self.max - self.gap 
-            end = self.max
-            self.loadTopicPoints(self.filteredWordsByTopic[topic])
-            childrenItems = self.getSiblings(self.filteredWordsByTopic[topic], start, end, 1)
-            topicData = {
-                "name": topic,
-                "children": childrenItems
-            }
-            children.append(topicData)
+        self.wordIdsByZones = self.getWordsByZones(wordIds, max)
         
-        self.data["children"] = children
-        return self.data
-    
-    def setMinMax(self, points):
-        self.min = 99999
-        self.max = 0
-        
-        for point in points:
-            if point['number_of_blocks'] > self.max:
-                self.max = point['number_of_blocks']
-            if point['number_of_blocks'] < self.min:
-                self.min = point['number_of_blocks']
-        return
-    
-    def loadTopicPoints(self, points):
-        self.indexedPoints = {}
-        for point in points:
-            self.indexedPoints[point['index']] = point
-            
-        return
-    
-    def getSiblings(self, points, start, end, level):
-        siblings = []
-        for point in points:
-            if (point['number_of_blocks'] >= start) and  (point['number_of_blocks'] < end):
-                item = {
-                    "name": point['label'],
-                    "size": point['number_of_blocks'],
-                    "children": self.getChild(point['index'], end - self.gap)
-                }
-                siblings.append(item)
-            
-        return siblings
-    
-    def getChild(self, parentIndex, end):
-        if parentIndex not in self.wordCoOccurance:
+        if not len(self.wordIdsByZones):
             return []
-        
-        prospectiveChildren = self.wordCoOccurance[parentIndex]
-        start = end - self.gap 
+
+        for wordId in self.wordIdsByZones[0]:
+            if wordId in self.processedIndexes:
+                continue
+            self.processedIndexes.append(wordId)
+            item = {}
+            item['name'] = self.points[wordId]['label']
+            item['children'] = self.getChildren(wordId, 1, topic)
+            item['size'] = len(item['children'])
+            children.append(item)
+            
+            
+        return children
+    
+    def getChildren(self, wordId, zone, topic):
         children = []
+        candidates = []
+
+        if zone > 25:
+            return []
+
+        if zone in self.wordIdsByZones.keys():
+            candidates = self.wordIdsByZones[zone]
+            if not len(candidates):
+                return self.getChildren(wordId, zone+1, topic)
+        elif (wordId in self.wordCoOccurance.keys()):
+            candidates = self.wordCoOccurance[wordId]
+
+        if not len(candidates):
+            return children
+
+        #common = list(set(candidates).intersection(relatedWords))
         
-        for index in prospectiveChildren:
-            if index == parentIndex:
-                continue
-            if index not in self.indexedPoints.keys():
-                continue
-            point = self.indexedPoints[index]
-            if (point['number_of_blocks'] >= start) and (point['number_of_blocks'] < end):
-                item = {
-                    "name": point['label'],
-                    "size": point['number_of_blocks'],
-                    "children": self.getChild(point['index'], end - self.gap)
-                }
-                children.append(item)
+        #if not len(common):
+        #    common = relatedWords
+        # print(candidates)
+        for itemId in candidates:
+            point = self.points[itemId]
+            #print('--topic -- ', topic, ' -- ', point['topic'])
+            if (itemId == wordId) or (topic != point['topic']) or (itemId in self.processedIndexes):
+              continue
+            self.processedIndexes.append(itemId)
+            item = {}
+            item['name'] = self.points[itemId]['label']
+            itemChildren = self.getChildren(itemId, zone+1, topic)
+            item['size'] = len(itemChildren)
+            item['children'] = itemChildren
+            children.append(item)
         
         return children
+    
+    
+    def getWordsByZones(self, wordIds, max):
+        gap = max / self.totalZones
+        zones = {}
+        end = max
+        start = end - gap
+        zoneIndex = 0
+        while start >= 0:
+            zone = []
+            for index in wordIds:
+                point = self.points[index]
+                if (point['number_of_blocks'] > start) and (point['number_of_blocks'] <= end):
+                    zone.append(point['index'])
+                    self.points[index]['zone'] = zoneIndex
+                    
+            zones[zoneIndex] = zone
+            end = start
+            start = end - gap
+            zoneIndex += 1
         
+        return zones
+    
+    def preparePoints(self):
+        for word in self.vocab.keys():
+            details = self.vocab[word]
+            topic = details['topic']
+            if topic not in self.topics:
+                self.max[topic] = 0
+                self.topicWordIds[topic] = []
+                self.topics.append(topic)
+                
+            if self.max['points'] < details['number_of_blocks']:
+                self.max['points'] = details['number_of_blocks']
+                
+            if self.max[topic] < details['number_of_blocks']:
+                self.max[topic] = details['number_of_blocks']
+            
+            self.topicWordIds[topic].append(details['index'])    
+            self.points[details['index']] = details
+            
+        return
     
     def getCoOccurrence(self):
         wordCoOccurance = {}
@@ -113,6 +164,7 @@ class Hierarchy(Visualization):
         return wordCoOccurance
     
     def save(self):
+        print('path', self._getPath())
         with open(self._getPath(), 'w') as outfile:
             json.dump(self.data, outfile)
         return

@@ -16,7 +16,7 @@
 </head>
 
 <body>
-    <h1>Word Cloud Representation of GC</h1>
+    <h1>Whole Cloud Representation of GC</h1>
     <ol>
         <li><a href="/cwr/index.html">Home</a></li>
         <li><a href="/cwr/wordcloud/index.html">Word Cloud</a></li>
@@ -28,29 +28,32 @@
     </ol>
     
     <div id="block1" class="block"></div>
-    <div id="block2" class="block"></div>
-    <div id="block3" class="block"></div>
-    <div id="block4" class="block"></div>
-    <div id="block5" class="block"></div>
-    <div id="block6" class="block"></div>
     <script>
+        var topicIndex = {
+            'Topic 1': 0,
+            'Topic 2': 2,
+            'Topic 3': 3,
+            'Topic 4': 4,
+            'Topic 5': 5,
+            'Topic 6': 6
+        };
 
         var margin = {top: 0, right: 0, bottom: 0, left: 0},
-            width = 500 - margin.left - margin.right,
-            height = 300 - margin.top - margin.bottom;
+            width = 1500 - margin.left - margin.right,
+            height = 700 - margin.top - margin.bottom;
         var color = d3.scale.ordinal().range(["#C733FF","#339CFF","#9FFF33","#436C0B","#FFC133", "#FF4C33"]);
 
-        function display(data, container, topicColor){
+        function display(data, container){
             var categories = d3.keys(d3.nest().key(function(d) { return d.topic; }).map(data));
             
-            var fontSize = d3.scale.pow().exponent(5).domain([0,1]).range([1,100]);
+            var fontSize = d3.scale.pow().exponent(5).domain([0,1]).range([10,80]);
             var layout = d3.layout.cloud()
                 .timeInterval(1)
                 .size([width, height])
-                .words(data.slice(0,100))
+                .words(data)
                 .rotate(function(d) { return 0; })
                 .font('monospace')
-                .fontSize(function(d,i) { return (100 - d.font_size); })
+                .fontSize(function(d,i) { return (105 - d.font_size); })
                 .text(function(d) { return d.label; })
                 .spiral("archimedean")
                 .on("end", draw)
@@ -80,7 +83,7 @@
                 .call(xAxis)
                 .selectAll('text')
                 .style('font-size','20px')
-                .style('fill',function(d) { return color(d); })
+                .style('fill',function(d) { return color(topicIndex[d.topic]); })
                 .style('font','sans-serif');
 
             function draw(words) {
@@ -92,7 +95,7 @@
                     .style("font-family", function(d) { return d.font; })
                     .style("fill", function(d) { 
                         var paringObject = data.filter(function(obj) { return true});
-                        return color(topicColor); 
+                        return color(topicIndex[d.topic]); 
                     })
                     .attr("text-anchor", "middle")
                     .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
@@ -100,28 +103,8 @@
             };
         }
 
-        d3.csv("http://localhost:8080/cwr/data/covid19/Topic1_cwr_gc.csv", function(error, data) {
-            display(data, '#block1', 0)
-        });
-
-        d3.csv("http://localhost:8080/cwr/data/covid19/Topic2_cwr_gc.csv", function(error, data) {
-            display(data, '#block2', 1)
-        });
-
-        d3.csv("http://localhost:8080/cwr/data/covid19/Topic3_cwr_gc.csv", function(error, data) {
-            display(data, '#block3', 2)
-        });
-
-        d3.csv("http://localhost:8080/cwr/data/covid19/Topic4_cwr_gc.csv", function(error, data) {
-            display(data, '#block4', 3)
-        });
-
-        d3.csv("http://localhost:8080/cwr/data/covid19/Topic5_cwr_gc.csv", function(error, data) {
-            display(data, '#block4', 4)
-        });
-
-        d3.csv("http://localhost:8080/cwr/data/covid19/Topic6_cwr_gc.csv", function(error, data) {
-            display(data, '#block6', 5)
+        d3.csv("http://localhost:8080/cwr/data/covid19/cwr_gc.csv", function(error, data) {
+            display(data, '#block1')
         });
 
         

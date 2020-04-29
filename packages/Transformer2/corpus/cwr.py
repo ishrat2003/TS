@@ -2,6 +2,7 @@ from .meta import Meta
 from .visualization import Visualization
 import numpy
 import utility
+import math
 
 class CWR(Visualization):
     
@@ -12,6 +13,18 @@ class CWR(Visualization):
         self.startAngle = 0
         self.topicFilter = None
         self.maxRadius = 0
+        self.totalZones = 10
+        self.totalFonts = 100
+        self.zoneGap = 0
+        self.fontGap = 0
+        return
+    
+    def setTotalZones(self, totalZones):
+        self.totalZones = totalZones
+        return
+    
+    def setTotalFonts(self, totalZones):
+        self.totalFonts = totalZones
         return
     
     def setTopicFilter(self, topicName):
@@ -25,6 +38,17 @@ class CWR(Visualization):
     def setStartAngle(self, start):
         self.startAngle = start
         return
+    
+    def setMaximumRadius(self):
+        for word in self.vocab.keys():
+            if self.maxRadius < self.vocab[word]['number_of_blocks']:
+                self.maxRadius = self.vocab[word]['number_of_blocks'] + 10
+        return
+    
+    def setGaps(self):
+        self.zoneGap = self.maxRadius / self.totalZones
+        self.fontGap = self.maxRadius / self.totalFonts
+        return
 
     def getPoints(self):
         topics = self.filteredWordsByTopic.keys()
@@ -35,6 +59,7 @@ class CWR(Visualization):
         
         self.startAngle = 0
         self.setMaximumRadius()
+        self.setGaps()
         
         self.points = []
         self.pointsFile = self.getFile('cwr_gc.csv')
@@ -60,15 +85,11 @@ class CWR(Visualization):
             currentTheta += thetaIncrement
             point['x'] = word['radius'] * numpy.cos(numpy.deg2rad(point['theta']))
             point['y'] = word['radius'] * numpy.sin(numpy.deg2rad(point['theta']))
+            point['zone'] = math.floor(point['radius'] / self.zoneGap)
+            point['font_size'] = math.floor(point['radius'] / self.fontGap)
             self.points.append(point)
             self.pointsFile.write(point)
 
-        return
-    
-    def setMaximumRadius(self):
-        for word in self.vocab.keys():
-            if self.maxRadius < self.vocab[word]['number_of_blocks']:
-                self.maxRadius = self.vocab[word]['number_of_blocks'] + 10
         return
     
     def savePoints(self):
