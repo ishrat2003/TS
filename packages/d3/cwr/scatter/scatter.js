@@ -12,14 +12,14 @@ var y = d3.scale.linear()
 
 var xCat = "x",
     yCat = "y",
-    rCat = "number_of_blocks",
+    rCat = 5,
     colorCat = "topic",
     labelCat = "label";
 
 d3.csv("http://localhost:8080/cwr/data/covid19/cwr_gc.csv", function(data) {
   data.forEach(function(d) {
-    d.x = +d.x;
-    d.y = +d.y;
+    d.x = d.x;
+    d.y = d.y;
   });
 
   var xMax = d3.max(data, function(d) { return d[xCat]; }) * 1.05,
@@ -62,7 +62,7 @@ d3.csv("http://localhost:8080/cwr/data/covid19/cwr_gc.csv", function(data) {
       .attr("width", outerWidth)
       .attr("height", outerHeight)
     .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .attr("transform", "translate(" + margin.left +  "," + margin.top + ")")
       .call(zoomBeh);
 
   svg.call(tip);
@@ -117,7 +117,7 @@ d3.csv("http://localhost:8080/cwr/data/covid19/cwr_gc.csv", function(data) {
       .data(data)
     .enter().append("circle")
       .classed("dot", true)
-      .attr("r", function (d) { return d[rCat]/ 5; })
+      .attr("r", function (d) { return rCat; })
       .attr("transform", transform)
       .style("fill", function(d) { return color(d[colorCat]); })
       .on("mouseover", tip.show)
@@ -127,7 +127,7 @@ d3.csv("http://localhost:8080/cwr/data/covid19/cwr_gc.csv", function(data) {
       .data(color.domain())
     .enter().append("g")
       .classed("legend", true)
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      .attr("transform", function(d, i) { return "translate(0," + i * 20  + ")"; });
 
   legend.append("circle")
       .attr("r", 3.5)
@@ -164,6 +164,6 @@ d3.csv("http://localhost:8080/cwr/data/covid19/cwr_gc.csv", function(data) {
   }
 
   function transform(d) {
-    return "translate(" + x(d[xCat]) + "," + y(d[yCat]) + ")";
+    return "translate("  + x(d[xCat]) + ","  + y(d[yCat]) +  ")";
   }
 });

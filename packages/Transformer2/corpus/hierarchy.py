@@ -101,11 +101,13 @@ class Hierarchy(Visualization):
             if (itemId == wordId) or (topic != point['topic']) or (itemId in self.processedIndexes):
               continue
             self.processedIndexes.append(itemId)
-            item = {}
+            item = point
             item['name'] = self.points[itemId]['label']
             itemChildren = self.getChildren(itemId, zone+1, topic)
             item['size'] = len(itemChildren)
+            item['number_of_blocks'] = itemChildren
             item['children'] = itemChildren
+            
             children.append(item)
         
         return children
@@ -154,8 +156,9 @@ class Hierarchy(Visualization):
     
     def getCoOccurrence(self):
         wordCoOccurance = {}
-        for doc in self.docsLCs:
-            for wordIndex1 in  doc:
+        for doc in self.docsLCs.keys():
+            relatedIndecies = self.docsLCs[doc]
+            for wordIndex1 in  relatedIndecies:
                 if wordIndex1 not in wordCoOccurance.keys():
                     wordCoOccurance[wordIndex1] = []
                 for wordIndex2 in  doc:

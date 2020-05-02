@@ -9,7 +9,8 @@ class Meta(Words):
     def __init__(self, datasetProcessor):
         super().__init__(datasetProcessor)
         self.metaFile = self.getFile('meta')
-        self.docsLCFile = []
+        self.docsLCFile = {}
+        self.wordDocs = {}
         return
     
     def process(self):
@@ -19,15 +20,26 @@ class Meta(Words):
             sourceText = self.datasetProcessor.getText(item)
             words = self.getLC(sourceText)
             indices = self.appendWords(words)
-            self.docsLCFile.append(indices)
+            label = self.datasetProcessor.getLabel(item)
+            self.docsLCFile[label] = indices
+            
+            for index in indices:
+                if index not in self.wordDocs.keys():
+                    self.wordDocs[index] = []
+                if label not in self.wordDocs[index]:
+                    self.wordDocs[index].append(label)
 
+        self.saveWordDocs()
+        del self.wordDocs
+        
+        self.saveDocLcs()
+        del self.docsLCFile
+        
         self.sortVocab() 
         for word in self.vocab.keys():
             self.metaFile.write(self.vocab[word])
             
-        
         self.saveVocab()
-        self.saveDocLcs()
         return
 
     def getLC(self, text):
@@ -65,6 +77,14 @@ class Meta(Words):
         self.docsLCFile = self._getFromPickel(self._getDocLcsPath())
         return self.docsLCFile
     
+    def saveWordDocs(self):
+        self._saveInPickel(self._getWordDocPath(), self.wordDocs)
+        return
+    
+    def loadWordDocs(self):
+        self.wordDocs = self._getFromPickel(self._getWordDocPath())
+        return self.wordDocs
+    
     def remove(self):
         super().remove()
         file = utility.File(self._getDocLcsPath())
@@ -76,3 +96,6 @@ class Meta(Words):
 
     def _getDocLcsPath(self):
     	return self._getFilePath('docs_lcs.sav', self.path)
+
+    def _getWordDocPath(self):
+        	return self._getFilePath('word_docs.sav', self.path)

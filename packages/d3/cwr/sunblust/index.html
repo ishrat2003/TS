@@ -31,10 +31,16 @@
 
 <body>
     <h1>Sunblust Representation of GC</h1>
+    
     <ol>
         <li><a href="/cwr/index.html">Home</a></li>
         <li><a href="/cwr/wordcloud/index.html">Word Cloud</a></li>
+        <li><a href="/cwr/wordcloud/sentiment.html">Sentiment Cloud</a></li>
+        <li><a href="/cwr/wordcloud/all.html">Whole Cloud</a></li>
         <li><a href="/cwr/sunblust/index.html">Sunblust</a></li>
+        <li><a href="/cwr/scatter/index.html">Scatter Plot</a></li>
+        <li><a href="/cwr/bubble/index.html">Bubble Plot</a></li>
+        <li><a href="/cwr/stream/index.html">Stream</a></li>
     </ol>
     <div id="block">
     </div>
@@ -92,7 +98,7 @@
             .attr('viewBox', `${-width / 2} ${-height / 2} ${width} ${height}`)
             .on('click', () => focusOn()); // Reset zoom on canvas click
 
-        d3.csv("http://localhost:8080/cwr/data/covid19/metavocab.csv", (error, root) => {
+        d3.json("http://localhost:8080/cwr/data/covid19/hierarchy.json", (error, root) => {
             if (error) throw error;
 
             root = d3.hierarchy(root);

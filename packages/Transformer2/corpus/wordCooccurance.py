@@ -26,8 +26,9 @@ class WordCooccurance(Visualization):
         totalPoints = len(self.points)
         vectors = numpy.zeros((totalPoints, totalPoints))
 
-        for doc in self.docsLCs:
-            for wordIndex1 in doc:
+        for doc in self.docsLCs.keys():
+            relatedIndecies = self.docsLCs[doc]
+            for wordIndex1 in relatedIndecies:
                 if wordIndex1 not in self.wordIds.keys():
                     continue
                 row = self.wordIds[wordIndex1]
