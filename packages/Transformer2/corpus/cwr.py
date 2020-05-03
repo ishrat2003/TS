@@ -17,6 +17,7 @@ class CWR(Visualization):
         self.totalFonts = 100
         self.zoneGap = 0
         self.fontGap = 0
+        self.prefix = ''
         return
     
     def setTotalZones(self, totalZones):
@@ -62,7 +63,7 @@ class CWR(Visualization):
         self.setGaps()
         
         self.points = []
-        self.pointsFile = self.getFile('cwr_gc.csv')
+        self.pointsFile = self.getFile(self.prefix + 'cwr_gc.csv')
         
         for topic in topics:
             if self.topicFilter and (topic != self.topicFilter):
@@ -79,21 +80,32 @@ class CWR(Visualization):
         
         for word in words:
             point = word
-            point['radius'] =  self.maxRadius - word['number_of_blocks']
-            point['topic'] = topic
+            point['radius'] =  self.getRadius(word)
             point['theta'] = currentTheta
             currentTheta += thetaIncrement
-            point['x'] = word['radius'] * numpy.cos(numpy.deg2rad(point['theta']))
-            point['y'] = word['radius'] * numpy.sin(numpy.deg2rad(point['theta']))
-            point['zone'] = math.floor(point['radius'] / self.zoneGap)
-            point['font_size'] = math.floor(point['radius'] / self.fontGap)
+            point = self.getPointDetails(point, topic)
+            point = self.afterProcess(point)
             self.points.append(point)
             self.pointsFile.write(point)
+            
 
         return
     
+    def afterProcess(self, point):
+        return point
+    
+    def getRadius(self, word):
+        return self.maxRadius - word['number_of_blocks']
+    
+    def getPointDetails(self, point, topic):
+        point['topic'] = topic
+        point['x'] = point['radius'] * numpy.cos(numpy.deg2rad(point['theta']))
+        point['y'] = point['radius'] * numpy.sin(numpy.deg2rad(point['theta']))
+        point['zone'] = math.floor(point['radius'] / self.zoneGap)
+        point['font_size'] = math.floor(point['radius'] / self.fontGap)
+        return point
+    
     def savePoints(self):
-        print(self.points)
         self._saveInPickel(self._getPointsPath(), self.points)
         return
     
@@ -124,7 +136,7 @@ class CWR(Visualization):
     def getCategorizedFiles(self, keys):
         files = {}
         for key in keys:
-            files[key] = self.getFile( key + '_cwr_gc.csv')
+            files[key] = self.getFile( self.prefix + key + '_cwr_gc.csv')
         return files
     
     def removeCategorizedFiles(self, keys):
@@ -136,10 +148,10 @@ class CWR(Visualization):
     def remove(self):
         file = utility.File(self._getPointsPath())
         file.remove()
-        csvFile = self.getFile('cwr_gc.csv')
+        csvFile = self.getFile(self.prefix + 'cwr_gc.csv')
         file.remove()
         return
 
     def _getPointsPath(self):
-    	return self._getFilePath('cwr_gc_pk.sav', self.path)
+    	return self._getFilePath(self.prefix + 'cwr_gc_pk.sav', self.path)
 

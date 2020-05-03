@@ -15,7 +15,7 @@ class Visualization(Writer):
     
     def process(self, minNumberOfDocsAppeared = 5):
         if not len(self.vocab):
-            return
+            return None
         words = self.setFilteredWordsByTopics(minNumberOfDocsAppeared)
         points = self.getPoints()
         self.savePoints()
@@ -30,6 +30,8 @@ class Visualization(Writer):
     def setFilteredWordsByTopics(self, minNumberOfDocsAppeared):
         for word in self.vocab.keys():
             details = self.vocab[word]
+            if not self.shouldInclude(details):
+                continue
             topic = details['topic']
             occurance = details['count']
             docCount = details['number_of_blocks']
@@ -40,3 +42,6 @@ class Visualization(Writer):
             self.filteredWordsByTopic[topic].append(details)
             
         return
+    
+    def shouldInclude(self, word):
+        return True
