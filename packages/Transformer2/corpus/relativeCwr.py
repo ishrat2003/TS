@@ -81,7 +81,7 @@ class RelativeCWR(CWR):
                 'name': point['label'],
                 'size': point['relative_num_blocks']
             })
-        return children[0 : 10]
+        return children
     
     def shouldInclude(self, word):
         wordIndex = word['index']

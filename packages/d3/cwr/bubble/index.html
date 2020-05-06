@@ -24,5 +24,12 @@
     </ol>
 
     <script src="scripts.js" charset="utf-8"></script>
-
+    <script src="legend.js" charset="utf-8"></script>
+    <script>
+    d3.json("http://localhost:8080/cwr/data/covid19/relative/china.json", function(error, data) {  
+        if (error) throw error;
+        displayContext(data);
+        addLegend(100, 100)
+    });
+    </script>
 </body>

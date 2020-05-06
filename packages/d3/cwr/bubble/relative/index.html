@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<head>
+    <title>Bubble Chart using CWR</title>
+    <style>
+    text {
+        font: 10px sans-serif;
+    }
+    .box {
+        width:100%;
+        margin: 50px 50px 50px 50px;
+    }
+    h1 {
+        margin: 50px 50px 50px 50px;
+    }
+    #left {
+        float: left;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
+    #right {
+        float: left;
+        rows: 2;
+        white-space:nowrap;
+    }
+
+    
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <h1>Bubble chart using CWR</h1>
+    <ol>
+        <li><a href="/cwr/index.html">Home</a></li>
+        <li><a href="/cwr/wordcloud/index.html">Word Cloud</a></li>
+        <li><a href="/cwr/wordcloud/sentiment.html">Sentiment Cloud</a></li>
+        <li><a href="/cwr/wordcloud/all.html">Whole Cloud</a></li>
+        <li><a href="/cwr/sunblust/index.html">Sunblust</a></li>
+        <li><a href="/cwr/scatter/index.html">Scatter Plot</a></li>
+        <li><a href="/cwr/bubble/index.html">Bubble Plot</a></li>
+        <li><a href="/cwr/stream/index.html">Stream</a></li>
+    </ol>
+    <div id="china" class="box">
+        <div id="left">
+            <h1>China (322) </h1>
+        </div>
+        <div id="right"></div>
+    </div>
+    <br>
+    <div id="SARSCoV" class="box">
+        <div id="left">
+            <h1>SARSCoV (98) </h1>
+        </div>
+        <div id="right"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
+    <script src="cloud.js" charset="utf-8"></script>
+    <script src="legend.js" charset="utf-8"></script>
+    <script src="scripts.js" charset="utf-8"></script>
+    
+    <script>
+    d3.json("http://localhost:8080/cwr/data/covid19/relative/china.json", function(error, data) {  
+        if (error) throw error;
+        displayContext('#china > #left', data, 600, 600);
+        addLegend('#china > #left', 100, 100);
+    });
+    d3.json("http://localhost:8080/cwr/data/covid19/relative/china.json", function(error, data) {  
+        if (error) throw error;
+        display(data, '#china > #right', 400, 400, 0.2)
+    });
+
+
+    d3.json("http://localhost:8080/cwr/data/covid19/relative/sarscov.json", function(error, data) {  
+        if (error) throw error;
+        displayContext('#SARSCoV > #left', data, 600, 600);
+        addLegend('#SARSCoV > #left', 100, 100);
+    });
+    d3.json("http://localhost:8080/cwr/data/covid19/relative/sarscov.json", function(error, data) {  
+        if (error) throw error;
+        display(data, '#SARSCoV > #right', 400, 400, 0.5)
+    });
+    </script>
+</body>

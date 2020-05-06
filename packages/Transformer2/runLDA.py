@@ -19,7 +19,6 @@ else:
     print(":::::::::::::: Train ::::::::::::::")
     lda = LDA(dataProcessor, os.path.join(params.data_directory, params.dataset_name))
     lda.remove()
-    lda.setNumberOfTopics(5)
     lda.setPerplexity(5)
     lda.setNumberOfTopics(6)
     lda.setNumberOfTotalTopFrequencyWord(10000)
