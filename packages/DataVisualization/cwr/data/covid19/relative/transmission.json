@@ -1,0 +1,196 @@
+{
+    "name": "transmission",
+    "size": 5,
+    "children": [
+        {
+            "name": "positive_sentiment",
+            "size": 1,
+            "children": [
+                {
+                    "name": "works",
+                    "size": 6
+                }
+            ]
+        },
+        {
+            "name": "negative_sentiment",
+            "size": 9,
+            "children": [
+                {
+                    "name": "infections",
+                    "size": 168
+                },
+                {
+                    "name": "virus",
+                    "size": 64
+                },
+                {
+                    "name": "epidemic",
+                    "size": 40
+                },
+                {
+                    "name": "isolate",
+                    "size": 32
+                },
+                {
+                    "name": "risk",
+                    "size": 26
+                },
+                {
+                    "name": "delay",
+                    "size": 11
+                },
+                {
+                    "name": "illness",
+                    "size": 8
+                },
+                {
+                    "name": "syndrome",
+                    "size": 7
+                },
+                {
+                    "name": "attack",
+                    "size": 6
+                }
+            ]
+        },
+        {
+            "name": "same_topic",
+            "size": 10,
+            "children": [
+                {
+                    "name": "transmission",
+                    "size": 333
+                },
+                {
+                    "name": "outbreaks",
+                    "size": 106
+                },
+                {
+                    "name": "individuals",
+                    "size": 91
+                },
+                {
+                    "name": "days",
+                    "size": 86
+                },
+                {
+                    "name": "measures",
+                    "size": 78
+                },
+                {
+                    "name": "period",
+                    "size": 78
+                },
+                {
+                    "name": "countries",
+                    "size": 75
+                },
+                {
+                    "name": "contact",
+                    "size": 69
+                },
+                {
+                    "name": "parameters",
+                    "size": 64
+                },
+                {
+                    "name": "spread",
+                    "size": 64
+                }
+            ]
+        },
+        {
+            "name": "core_context",
+            "size": 16,
+            "children": [
+                {
+                    "name": "cases",
+                    "size": 218
+                },
+                {
+                    "name": "number",
+                    "size": 203
+                },
+                {
+                    "name": "models",
+                    "size": 192
+                },
+                {
+                    "name": "COVID19",
+                    "size": 169
+                },
+                {
+                    "name": "license",
+                    "size": 160
+                },
+                {
+                    "name": "time",
+                    "size": 151
+                },
+                {
+                    "name": "data",
+                    "size": 145
+                },
+                {
+                    "name": "rate",
+                    "size": 143
+                },
+                {
+                    "name": "disease",
+                    "size": 128
+                },
+                {
+                    "name": "populations",
+                    "size": 112
+                },
+                {
+                    "name": "authorfunder",
+                    "size": 100
+                },
+                {
+                    "name": "holder",
+                    "size": 86
+                },
+                {
+                    "name": "perpetuity",
+                    "size": 83
+                },
+                {
+                    "name": "studies",
+                    "size": 69
+                },
+                {
+                    "name": "Figure",
+                    "size": 64
+                },
+                {
+                    "name": "SARSCoV2",
+                    "size": 59
+                }
+            ]
+        },
+        {
+            "name": "other_topic",
+            "size": 4,
+            "children": [
+                {
+                    "name": "China",
+                    "size": 96
+                },
+                {
+                    "name": "health",
+                    "size": 69
+                },
+                {
+                    "name": "International",
+                    "size": 67
+                },
+                {
+                    "name": "Wuhan",
+                    "size": 65
+                }
+            ]
+        }
+    ]
+}

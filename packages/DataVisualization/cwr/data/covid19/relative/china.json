@@ -1,0 +1,188 @@
+{
+    "name": "China",
+    "size": 5,
+    "children": [
+        {
+            "name": "positive_sentiment",
+            "size": 1,
+            "children": [
+                {
+                    "name": "works",
+                    "size": 9
+                }
+            ]
+        },
+        {
+            "name": "negative_sentiment",
+            "size": 8,
+            "children": [
+                {
+                    "name": "infections",
+                    "size": 121
+                },
+                {
+                    "name": "virus",
+                    "size": 70
+                },
+                {
+                    "name": "epidemic",
+                    "size": 51
+                },
+                {
+                    "name": "risk",
+                    "size": 24
+                },
+                {
+                    "name": "syndrome",
+                    "size": 14
+                },
+                {
+                    "name": "isolate",
+                    "size": 13
+                },
+                {
+                    "name": "severity",
+                    "size": 11
+                },
+                {
+                    "name": "illness",
+                    "size": 7
+                }
+            ]
+        },
+        {
+            "name": "same_topic",
+            "size": 6,
+            "children": [
+                {
+                    "name": "China",
+                    "size": 322
+                },
+                {
+                    "name": "Wuhan",
+                    "size": 115
+                },
+                {
+                    "name": "Province",
+                    "size": 79
+                },
+                {
+                    "name": "January",
+                    "size": 77
+                },
+                {
+                    "name": "International",
+                    "size": 66
+                },
+                {
+                    "name": "Hubei",
+                    "size": 57
+                }
+            ]
+        },
+        {
+            "name": "core_context",
+            "size": 17,
+            "children": [
+                {
+                    "name": "cases",
+                    "size": 250
+                },
+                {
+                    "name": "COVID19",
+                    "size": 202
+                },
+                {
+                    "name": "number",
+                    "size": 190
+                },
+                {
+                    "name": "data",
+                    "size": 168
+                },
+                {
+                    "name": "models",
+                    "size": 148
+                },
+                {
+                    "name": "time",
+                    "size": 135
+                },
+                {
+                    "name": "disease",
+                    "size": 131
+                },
+                {
+                    "name": "rate",
+                    "size": 100
+                },
+                {
+                    "name": "transmission",
+                    "size": 96
+                },
+                {
+                    "name": "holder",
+                    "size": 91
+                },
+                {
+                    "name": "perpetuity",
+                    "size": 91
+                },
+                {
+                    "name": "patients",
+                    "size": 87
+                },
+                {
+                    "name": "studies",
+                    "size": 86
+                },
+                {
+                    "name": "populations",
+                    "size": 79
+                },
+                {
+                    "name": "SARSCoV2",
+                    "size": 60
+                }
+            ]
+        },
+        {
+            "name": "other_topic",
+            "size": 8,
+            "children": [
+                {
+                    "name": "outbreaks",
+                    "size": 113
+                },
+                {
+                    "name": "countries",
+                    "size": 105
+                },
+                {
+                    "name": "days",
+                    "size": 93
+                },
+                {
+                    "name": "health",
+                    "size": 84
+                },
+                {
+                    "name": "coronavirus",
+                    "size": 80
+                },
+                {
+                    "name": "measures",
+                    "size": 68
+                },
+                {
+                    "name": "period",
+                    "size": 64
+                },
+                {
+                    "name": "spread",
+                    "size": 63
+                }
+            ]
+        }
+    ]
+}

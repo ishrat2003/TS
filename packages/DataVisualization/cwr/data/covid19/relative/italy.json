@@ -1,0 +1,217 @@
+{
+    "name": "Italy",
+    "size": 5,
+    "children": [
+        {
+            "name": "negative_sentiment",
+            "size": 4,
+            "children": [
+                {
+                    "name": "infections",
+                    "size": 40
+                },
+                {
+                    "name": "epidemic",
+                    "size": 18
+                },
+                {
+                    "name": "virus",
+                    "size": 15
+                },
+                {
+                    "name": "risk",
+                    "size": 6
+                }
+            ]
+        },
+        {
+            "name": "same_topic",
+            "size": 5,
+            "children": [
+                {
+                    "name": "Italy",
+                    "size": 94
+                },
+                {
+                    "name": "Korea",
+                    "size": 16
+                },
+                {
+                    "name": "South",
+                    "size": 16
+                },
+                {
+                    "name": "Spain",
+                    "size": 12
+                },
+                {
+                    "name": "February",
+                    "size": 11
+                }
+            ]
+        },
+        {
+            "name": "core_context",
+            "size": 38,
+            "children": [
+                {
+                    "name": "cases",
+                    "size": 73
+                },
+                {
+                    "name": "number",
+                    "size": 73
+                },
+                {
+                    "name": "data",
+                    "size": 67
+                },
+                {
+                    "name": "COVID19",
+                    "size": 62
+                },
+                {
+                    "name": "countries",
+                    "size": 62
+                },
+                {
+                    "name": "models",
+                    "size": 53
+                },
+                {
+                    "name": "time",
+                    "size": 51
+                },
+                {
+                    "name": "license",
+                    "size": 50
+                },
+                {
+                    "name": "rate",
+                    "size": 43
+                },
+                {
+                    "name": "days",
+                    "size": 37
+                },
+                {
+                    "name": "China",
+                    "size": 36
+                },
+                {
+                    "name": "deaths",
+                    "size": 36
+                },
+                {
+                    "name": "populations",
+                    "size": 35
+                },
+                {
+                    "name": "March",
+                    "size": 34
+                },
+                {
+                    "name": "authorfunder",
+                    "size": 28
+                },
+                {
+                    "name": "disease",
+                    "size": 26
+                },
+                {
+                    "name": "measures",
+                    "size": 25
+                },
+                {
+                    "name": "perpetuity",
+                    "size": 24
+                },
+                {
+                    "name": "transmission",
+                    "size": 24
+                },
+                {
+                    "name": "spread",
+                    "size": 22
+                },
+                {
+                    "name": "regions",
+                    "size": 22
+                },
+                {
+                    "name": "outbreaks",
+                    "size": 21
+                },
+                {
+                    "name": "International",
+                    "size": 20
+                },
+                {
+                    "name": "holder",
+                    "size": 20
+                },
+                {
+                    "name": "individuals",
+                    "size": 19
+                },
+                {
+                    "name": "health",
+                    "size": 18
+                },
+                {
+                    "name": "parameters",
+                    "size": 17
+                },
+                {
+                    "name": "SARSCoV2",
+                    "size": 15
+                },
+                {
+                    "name": "people",
+                    "size": 15
+                },
+                {
+                    "name": "studies",
+                    "size": 15
+                },
+                {
+                    "name": "Figure",
+                    "size": 14
+                },
+                {
+                    "name": "Fig",
+                    "size": 14
+                },
+                {
+                    "name": "period",
+                    "size": 14
+                },
+                {
+                    "name": "growth",
+                    "size": 14
+                },
+                {
+                    "name": "patients",
+                    "size": 13
+                },
+                {
+                    "name": "estimators",
+                    "size": 13
+                },
+                {
+                    "name": "age",
+                    "size": 12
+                },
+                {
+                    "name": "controls",
+                    "size": 12
+                }
+            ]
+        },
+        {
+            "name": "other_topic",
+            "size": 0,
+            "children": []
+        }
+    ]
+}

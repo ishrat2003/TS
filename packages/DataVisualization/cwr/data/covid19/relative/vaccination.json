@@ -1,0 +1,204 @@
+{
+    "name": "vaccination",
+    "size": 5,
+    "children": [
+        {
+            "name": "positive_sentiment",
+            "size": 1,
+            "children": [
+                {
+                    "name": "protection",
+                    "size": 8
+                }
+            ]
+        },
+        {
+            "name": "negative_sentiment",
+            "size": 2,
+            "children": [
+                {
+                    "name": "infections",
+                    "size": 31
+                },
+                {
+                    "name": "virus",
+                    "size": 23
+                }
+            ]
+        },
+        {
+            "name": "same_topic",
+            "size": 2,
+            "children": [
+                {
+                    "name": "vaccination",
+                    "size": 81
+                },
+                {
+                    "name": "development",
+                    "size": 9
+                }
+            ]
+        },
+        {
+            "name": "core_context",
+            "size": 30,
+            "children": [
+                {
+                    "name": "protein",
+                    "size": 32
+                },
+                {
+                    "name": "COVID19",
+                    "size": 29
+                },
+                {
+                    "name": "populations",
+                    "size": 28
+                },
+                {
+                    "name": "SARSCoV2",
+                    "size": 25
+                },
+                {
+                    "name": "disease",
+                    "size": 22
+                },
+                {
+                    "name": "holder",
+                    "size": 22
+                },
+                {
+                    "name": "studies",
+                    "size": 22
+                },
+                {
+                    "name": "data",
+                    "size": 19
+                },
+                {
+                    "name": "rate",
+                    "size": 17
+                },
+                {
+                    "name": "countries",
+                    "size": 17
+                },
+                {
+                    "name": "cases",
+                    "size": 16
+                },
+                {
+                    "name": "coronavirus",
+                    "size": 16
+                },
+                {
+                    "name": "cells",
+                    "size": 16
+                },
+                {
+                    "name": "number",
+                    "size": 15
+                },
+                {
+                    "name": "models",
+                    "size": 15
+                },
+                {
+                    "name": "sequencing",
+                    "size": 15
+                },
+                {
+                    "name": "response",
+                    "size": 15
+                },
+                {
+                    "name": "structure",
+                    "size": 14
+                },
+                {
+                    "name": "authorfunder",
+                    "size": 13
+                },
+                {
+                    "name": "bioRxiv",
+                    "size": 13
+                },
+                {
+                    "name": "analysis",
+                    "size": 13
+                },
+                {
+                    "name": "outbreaks",
+                    "size": 12
+                },
+                {
+                    "name": "predictions",
+                    "size": 12
+                },
+                {
+                    "name": "Figure",
+                    "size": 11
+                },
+                {
+                    "name": "Fig",
+                    "size": 10
+                },
+                {
+                    "name": "patients",
+                    "size": 10
+                },
+                {
+                    "name": "time",
+                    "size": 10
+                },
+                {
+                    "name": "transmission",
+                    "size": 9
+                },
+                {
+                    "name": "genomes",
+                    "size": 9
+                }
+            ]
+        },
+        {
+            "name": "other_topic",
+            "size": 8,
+            "children": [
+                {
+                    "name": "epitope",
+                    "size": 21
+                },
+                {
+                    "name": "immune",
+                    "size": 14
+                },
+                {
+                    "name": "BCG",
+                    "size": 12
+                },
+                {
+                    "name": "peptide",
+                    "size": 12
+                },
+                {
+                    "name": "antigen",
+                    "size": 11
+                },
+                {
+                    "name": "antibody",
+                    "size": 10
+                },
+                {
+                    "name": "MHC",
+                    "size": 9
+                },
+                {
+                    "name": "policies",
+                    "size": 9
+                }
+            ]
+        }
+    ]
+}

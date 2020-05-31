@@ -1,0 +1,112 @@
+{
+    "name": "Spain",
+    "size": 5,
+    "children": [
+        {
+            "name": "negative_sentiment",
+            "size": 1,
+            "children": [
+                {
+                    "name": "infections",
+                    "size": 9
+                }
+            ]
+        },
+        {
+            "name": "same_topic",
+            "size": 0,
+            "children": []
+        },
+        {
+            "name": "core_context",
+            "size": 20,
+            "children": [
+                {
+                    "name": "Spain",
+                    "size": 23
+                },
+                {
+                    "name": "number",
+                    "size": 20
+                },
+                {
+                    "name": "cases",
+                    "size": 19
+                },
+                {
+                    "name": "countries",
+                    "size": 18
+                },
+                {
+                    "name": "time",
+                    "size": 13
+                },
+                {
+                    "name": "rate",
+                    "size": 13
+                },
+                {
+                    "name": "COVID19",
+                    "size": 12
+                },
+                {
+                    "name": "Italy",
+                    "size": 12
+                },
+                {
+                    "name": "data",
+                    "size": 12
+                },
+                {
+                    "name": "models",
+                    "size": 12
+                },
+                {
+                    "name": "deaths",
+                    "size": 12
+                },
+                {
+                    "name": "populations",
+                    "size": 10
+                },
+                {
+                    "name": "license",
+                    "size": 9
+                },
+                {
+                    "name": "authorfunder",
+                    "size": 7
+                },
+                {
+                    "name": "SARSCoV2",
+                    "size": 7
+                },
+                {
+                    "name": "disease",
+                    "size": 7
+                },
+                {
+                    "name": "holder",
+                    "size": 7
+                },
+                {
+                    "name": "days",
+                    "size": 7
+                },
+                {
+                    "name": "International",
+                    "size": 6
+                },
+                {
+                    "name": "perpetuity",
+                    "size": 6
+                }
+            ]
+        },
+        {
+            "name": "other_topic",
+            "size": 0,
+            "children": []
+        }
+    ]
+}

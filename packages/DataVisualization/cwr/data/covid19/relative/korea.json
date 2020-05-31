@@ -1,0 +1,177 @@
+{
+    "name": "Korea",
+    "size": 5,
+    "children": [
+        {
+            "name": "negative_sentiment",
+            "size": 3,
+            "children": [
+                {
+                    "name": "infections",
+                    "size": 12
+                },
+                {
+                    "name": "epidemic",
+                    "size": 8
+                },
+                {
+                    "name": "virus",
+                    "size": 6
+                }
+            ]
+        },
+        {
+            "name": "same_topic",
+            "size": 2,
+            "children": [
+                {
+                    "name": "Korea",
+                    "size": 38
+                },
+                {
+                    "name": "South",
+                    "size": 28
+                }
+            ]
+        },
+        {
+            "name": "core_context",
+            "size": 32,
+            "children": [
+                {
+                    "name": "cases",
+                    "size": 31
+                },
+                {
+                    "name": "number",
+                    "size": 31
+                },
+                {
+                    "name": "data",
+                    "size": 27
+                },
+                {
+                    "name": "COVID19",
+                    "size": 24
+                },
+                {
+                    "name": "countries",
+                    "size": 22
+                },
+                {
+                    "name": "China",
+                    "size": 19
+                },
+                {
+                    "name": "models",
+                    "size": 19
+                },
+                {
+                    "name": "rate",
+                    "size": 18
+                },
+                {
+                    "name": "Italy",
+                    "size": 16
+                },
+                {
+                    "name": "time",
+                    "size": 16
+                },
+                {
+                    "name": "license",
+                    "size": 14
+                },
+                {
+                    "name": "disease",
+                    "size": 12
+                },
+                {
+                    "name": "deaths",
+                    "size": 11
+                },
+                {
+                    "name": "authorfunder",
+                    "size": 10
+                },
+                {
+                    "name": "International",
+                    "size": 10
+                },
+                {
+                    "name": "March",
+                    "size": 10
+                },
+                {
+                    "name": "perpetuity",
+                    "size": 10
+                },
+                {
+                    "name": "days",
+                    "size": 10
+                },
+                {
+                    "name": "transmission",
+                    "size": 9
+                },
+                {
+                    "name": "spread",
+                    "size": 9
+                },
+                {
+                    "name": "holder",
+                    "size": 8
+                },
+                {
+                    "name": "populations",
+                    "size": 8
+                },
+                {
+                    "name": "measures",
+                    "size": 8
+                },
+                {
+                    "name": "people",
+                    "size": 8
+                },
+                {
+                    "name": "Figure",
+                    "size": 7
+                },
+                {
+                    "name": "Fig",
+                    "size": 7
+                },
+                {
+                    "name": "individuals",
+                    "size": 7
+                },
+                {
+                    "name": "January",
+                    "size": 6
+                },
+                {
+                    "name": "outbreaks",
+                    "size": 6
+                },
+                {
+                    "name": "parameters",
+                    "size": 6
+                },
+                {
+                    "name": "growth",
+                    "size": 6
+                },
+                {
+                    "name": "health",
+                    "size": 6
+                }
+            ]
+        },
+        {
+            "name": "other_topic",
+            "size": 0,
+            "children": []
+        }
+    ]
+}
