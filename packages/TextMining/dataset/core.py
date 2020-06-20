@@ -14,10 +14,11 @@ from .brexit import Brexit
 
 class Core:
 
-    def __init__(self, name, path):
+    def __init__(self, name, path, params = {}):
         self.name = name
         self.path = path
         self.dataSetProcessor = Base(self.path, self.name)
+        self.params = params
         return
     
     def get(self, percentage = 100, total = 0):
@@ -48,4 +49,6 @@ class Core:
 
         self.dataSetProcessor.setSplitPercentage(percentage)
         self.dataSetProcessor.setTotalItems(total)
+        self.dataSetProcessor.setMode(self.params.mode);
+        self.dataSetProcessor.setParams(self.params);
         return self.dataSetProcessor

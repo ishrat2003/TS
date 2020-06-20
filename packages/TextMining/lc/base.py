@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.pylab import rcParams
-
+import operator
 
 class Base():
 
@@ -28,6 +28,7 @@ class Base():
 		self.topScorePercentage = filterRate
 		self.filteredWords = {}
 		self.contributors = []
+		self.contributingWords = []
 		self.display = display
 		return
 
@@ -66,14 +67,22 @@ class Base():
 	def getContrinutors(self):
 		return self.contributors
 
+	def getContributingWords(self):
+		self.sortContributers();
+		words = [self.contributingWords[index]['pure_word'] for index in self.contributingWords]
+		return words
 
 	def getWordInfo(self):
 		return self.wordInfo
 
-
 	def getSentences(self):
 		return self.sentences
 
+	def getLengths(self):
+		return {
+			'sourceLength': len(self.wordInfo),
+			'contextLength': len(self.contributingWords)
+		}
 
 	def loadFilteredWords(self):
 		minAllowedScore = self.maxCount * self.filterRate
@@ -169,6 +178,7 @@ class Base():
 			if self.isTopic(word, minTopWordScores):
 				point['color'] = 'red'
 				self.contributors.append(word)
+				self.contributingWords.append(self.filteredWords[word])
 
 			points.append(point)
 
@@ -177,6 +187,18 @@ class Base():
 
 	def isTopic(self, word, minTopWordScores):
 		return (self.filteredWords[word]['score'] >= minTopWordScores)
+
+	def sortContributers(self, attribute = 'score'):
+		if not len(self.contributingWords):
+			return
+
+		sortedContributors = {}
+
+		for value in sorted(self.contributingWords, key=operator.itemgetter(attribute), reverse=True):
+			sortedContributors[value['stemmed_word']] = value
+
+		self.contributingWords = sortedContributors
+		return
 
 	def _getX(self, word):
 		return 0

@@ -15,7 +15,7 @@ class Newsroom(Base):
             return (item for item in trainingSet)
         
         if type == 'source':
-            return (text.numpy() for text, summary in trainingSet)
+            return (self.processSource(text.numpy()) for text, summary in trainingSet)
         
-        return (summary.numpy() for text, summary in trainingSet)
+        return (self.processTarget(summary.numpy()) for text, summary in trainingSet)
     

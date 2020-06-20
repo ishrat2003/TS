@@ -36,6 +36,7 @@ class Core:
     self.parser.add_argument('--occurance_contributing_factor', default=1.0, type=float)
     self.parser.add_argument('--type', default='title', help="title|summary|lda")
     self.parser.add_argument('--word',type=str)
+    self.parser.add_argument('--mode', default='none', help="none|context|masked_context")
     
     return
 

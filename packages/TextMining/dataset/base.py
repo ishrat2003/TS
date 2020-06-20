@@ -6,8 +6,10 @@ from nltk.stem.porter import PorterStemmer
 import re, sys, numpy
 from nltk import word_tokenize, pos_tag
 from nltk.stem.porter import PorterStemmer
+import lc as LC
+from file.writer import Writer
 
-class Base:
+class Base(Writer):
     
     def __init__(self, path, name = None, supervised = True):
         self.directoryPath = path
@@ -19,10 +21,14 @@ class Base:
         self.allowedPOSTypes = ['NN', 'NNP', 'NNS', 'NNPS']
         self.stopWords = utility.Utility.getStopWords()
         self.stemmer = PorterStemmer()
+        self.mode = ''
         if name:
             self.path = os.path.join(path, self.name)
         else:
             self.path = path
+            
+        self.sourceLengthFile = self.getFile('sourceLength.csv')
+        self.targetLengthFile = self.getFile('targetLength.csv')
         return
     
     def setSplitPercentage(self, percentage = 100):
@@ -33,6 +39,14 @@ class Base:
     
     def setTotalItems(self, total = 100):
         self.totalItems = total
+        return
+    
+    def setMode(self, mode = ''):
+        self.mode = mode
+        return
+    
+    def setParams(self, params):
+        self.params = params
         return
     
     def get(self):
@@ -52,8 +66,8 @@ class Base:
     def getProcessedPath(self):
         return self.path
     
-    def getVocabPath(self):
-        return os.path.join(self.path, "vocab")
+    def getVocabPath(self, prefix = ''):
+        return os.path.join(self.path, prefix + "vocab")
 
     def dataset(self):
         return None, None
@@ -97,6 +111,53 @@ class Base:
             processedWords.append(word)
 
         return ' '.join(processedWords)
+    
+    def processSource(self, text):
+        # print('------------------------------------------')
+        # print('Text:  ', text);
+        if self.mode in ['context', 'masked_context']:
+            text = text.decode("utf-8")   
+            context = self.__getContext(text)
+            return context.encode("utf-8")
+        return text
+    
+    def processTarget(self, text):
+        # print('Summary:    ', text)
+        words = word_tokenize(text.decode("utf-8"))
+        self.targetLengthFile.write({
+            'targetLength': len(words)
+        })
+        return text
+    
+    
+    def __getContext(self, text):
+        peripheralProcessor = LC.Peripheral(text)
+        peripheralProcessor.setAllowedPosTypes(self.allowedPOSTypes)
+        peripheralProcessor.setPositionContributingFactor(5)
+        peripheralProcessor.setOccuranceContributingFactor(0)
+        peripheralProcessor.setProperNounContributingFactor(0)
+        peripheralProcessor.setTopScorePercentage(0.2)
+        peripheralProcessor.setFilterWords(0)
+        peripheralProcessor.loadSentences(text)
+        peripheralProcessor.loadFilteredWords()
+        peripheralProcessor.train()
+        points = peripheralProcessor.getPoints()
+        
+        contributors = peripheralProcessor.getContributingWords()
+        self.sourceLengthFile.write(peripheralProcessor.getLengths())
+        
+        if self.mode == 'masked_context':
+            return self.maskedContext(contributors)
+        
+        # print('------------------------------------------')
+        # print('contributors (', str(len(contributors)), '): ', contributors)
+        return ' '.join(contributors)
+    
+    def maskedContext(self, contributors):
+        maskedContributors = ['CONTEXT' + str(index) for index in contributors]
+        # print('------------------------------------------')
+        # print('masked contributors (', str(len(contributors)), '): ', contributors)
+        return ' '.join(maskedContributors)
     
     def _cleanWord(self, word):
         return re.sub('[^a-zA-Z0-9]+', '', word)
