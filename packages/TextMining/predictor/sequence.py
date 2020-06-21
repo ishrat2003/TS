@@ -8,20 +8,27 @@ import io
 
 class Sequence():
 
-    def __init__(self, params, sourceTokenizer, targetTokenizer):
+    def __init__(self, params, sourceTokenizer, targetTokenizer, model = None):
+        self.params = params
         self.maxLength = params.target_max_sequence_length
         self.sourceTokenizer = sourceTokenizer
         self.targetTokenizer = targetTokenizer
-        inputVocabSize = self.sourceTokenizer.vocab_size + 2
-        targetVocabSize = self.targetTokenizer.vocab_size + 2
-        self.model = Transformer(params, inputVocabSize, targetVocabSize, 
-                          inputVocabSize, targetVocabSize)
+        self.setModel(model)
         self.mask = Mask()
         self.source = None
         self.attentionWeights = None
         self.outputSentences = None
         self.plotDir = os.path.join(params.plot_directory, params.dataset_name, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
         self.setTensorboard(self.plotDir)
+        return
+    
+    def setModel(self, model = None):
+        if model:
+            self.model = model
+        else:
+            inputVocabSize = self.sourceTokenizer.vocab_size + 2
+            targetVocabSize = self.targetTokenizer.vocab_size + 2
+            self.model = Transformer(self.params, inputVocabSize, targetVocabSize, inputVocabSize, targetVocabSize)
         return
     
     def setTensorboard(self, logDir):
@@ -44,6 +51,12 @@ class Sequence():
         for i in range(self.maxLength):
             encoderPaddingMask, decoderTargetPaddingAndLookAheadMask, decoderPaddingMask = self.mask.createMasks(encoderInput, target)
         
+            if (self.params.display_details == True) :
+                print('encoderInput: ', encoderInput.shape)
+                print('target: ', target.shape)
+                print('encoderPaddingMask: ', encoderPaddingMask.shape)
+                print('decoderTargetPaddingAndLookAheadMask: ', decoderTargetPaddingAndLookAheadMask.shape)
+                print('decoderPaddingMask: ', decoderPaddingMask.shape)
             # predictions.shape == (batch_size, seq_len, vocab_size)    
             predictions, attentionWeights = self.model(encoderInput, 
                 target,

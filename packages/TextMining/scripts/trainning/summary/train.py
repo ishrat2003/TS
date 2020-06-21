@@ -75,8 +75,8 @@ transformer = Transformer(params, inputVocabSize, targetVocabSize,
                           pe_target=targetVocabSize)
 
 trainer.setModel(transformer)
-trainer.setCheckpoint(params.checkpoint_directory + '/' + params.dataset_name)
-trainer.setTensorboard(params.log_directory + '/' + params.dataset_name)
+trainer.setCheckpoint(params.data_directory + '/' + params.dataset_name + '/checkpoints')
+trainer.setTensorboard(params.data_directory + '/' + params.dataset_name + '/logs')
 
 logging.info("# 3.2. Setting validation set")
 trainer.setValidationDataset(validationSet)

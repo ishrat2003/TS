@@ -16,10 +16,10 @@ from dataset.core import Core as Dataset
 from contextualVocab.lcVocab import LCVocab
 from text.sequences import Sequences
 
-# from layers.transformer import Transformer
-# from predictor.sequence import Sequence as TransformerPredictor
-# from network.trainer import Trainer
-# from evaluation.rouge import Rouge
+from layers.transformer import Transformer
+from predictor.sequence import Sequence as TransformerPredictor
+from network.trainer import Trainer
+from evaluation.rouge import Rouge
 
 logging.basicConfig(level=logging.INFO)
 # tf.executing_eagerly()
@@ -40,6 +40,9 @@ trainingSet, validationSet = dataProcessor.get()
 if not trainingSet or not validationSet:
     logging.error('No dataset found')
     sys.exit()
+    
+logging.info('trainingSet cardinality: ' + str(tf.data.experimental.cardinality(trainingSet).numpy()))
+logging.info('validationSet cardinality: ' + str(tf.data.experimental.cardinality(validationSet).numpy()))
 
 logging.info("# 2.2. Preparing vocab (source + target)")
 vocabProcessor = LCVocab(dataProcessor, params)
@@ -53,45 +56,46 @@ vocabProcessor.printSample(tokenizerSource, sampleString)
 logging.info("# Sample output using target vocab")
 vocabProcessor.printSample(tokenizerTarget, sampleString)
 
-# logging.info("# 2.3. Preparing sequences (source (text) + target (summary))")
-# sequencesProcesser = Sequences(params, tokenizerSource, tokenizerTarget)
-# trainingSequences = sequencesProcesser.getTokenizedDataset(trainingSet)
-# #validaitionSequences = sequencesProcesser.getTokenizedDataset(validationSet, True)
+logging.info("# 2.3. Preparing sequences (source (context) + target (summary))")
+sequencesProcesser = Sequences(params, tokenizerSource, tokenizerTarget)
+trainingSequences = sequencesProcesser.getTokenizedDataset(trainingSet)
+validaitionSequences = sequencesProcesser.getTokenizedDataset(validationSet, True)
 
-# # logging.info("# Sample sequences for training dataset")
-# # sequencesProcesser.printSample(trainingSequences)
-# # logging.info("# Sample sequences for validation dataset")
-# # sequencesProcesser.printSample(validaitionSequences)
+# logging.info("# Sample sequences for training dataset")
+# sequencesProcesser.printSample(trainingSequences)
+# logging.info("# Sample sequences for validation dataset")
+# sequencesProcesser.printSample(validaitionSequences)
 
-# logging.info("# 3. Training")
-# logging.info("# ================================")
-# logging.info("# 3.1. Setting layers")
+logging.info("# 3. Training")
+logging.info("# ================================")
+logging.info("# 3.1. Setting layers")
 
-# trainer = Trainer(params)
-# inputVocabSize = tokenizerSource.vocab_size + 2
-# targetVocabSize = tokenizerTarget.vocab_size + 2
-# transformer = Transformer(params, inputVocabSize, targetVocabSize, 
-#                           pe_input=inputVocabSize, 
-#                           pe_target=targetVocabSize)
+trainer = Trainer(params)
+inputVocabSize = tokenizerSource.vocab_size + 2
+targetVocabSize = tokenizerTarget.vocab_size + 2
+transformer = Transformer(params, inputVocabSize, targetVocabSize, 
+                          pe_input=inputVocabSize, 
+                          pe_target=targetVocabSize)
 
-# trainer.setModel(transformer)
-# trainer.setCheckpoint(params.checkpoint_directory + '/' + params.dataset_name)
-# trainer.setTensorboard(params.log_directory + '/' + params.dataset_name)
+trainer.setModel(transformer)
+trainer.setCheckpoint(params.data_directory + '/' + params.dataset_name + '/checkpoints')
+trainer.setTensorboard(params.data_directory + '/' + params.dataset_name + '/logs')
 
-# logging.info("# 3.2. Setting validation set")
-# trainer.setValidationDataset(validationSet)
+logging.info("# 3.2. Setting validation set")
+trainer.setValidationDataset(validationSet)
 
-# logging.info("# 3.2. Setting predictor")
-# predictor = TransformerPredictor(params, tokenizerSource, tokenizerTarget)
-# trainer.setPredictor(predictor)
+logging.info("# 3.2. Setting predictor")
+predictor = TransformerPredictor(params, tokenizerSource, tokenizerTarget, transformer)
+predictor.setModel(transformer)
+trainer.setPredictor(predictor)
 
-# logging.info("# 3.2. Setting predictor")
-# evaluator = Rouge(params)
-# trainer.setEvaluator(evaluator)
+logging.info("# 3.2. Setting predictor")
+evaluator = Rouge(params)
+trainer.setEvaluator(evaluator)
 
-# logging.info("# 3.3. Training & Evaluation")
-# trainer.process(int(params.epochs), trainingSequences)
+logging.info("# 3.3. Training & Evaluation")
+trainer.process(int(params.epochs), trainingSequences)
   
-# logging.info('Finished')
-# logging.info("# ================================")
+logging.info('Finished')
+logging.info("# ================================")
 

@@ -19,16 +19,14 @@ class Core:
     
     self.parser.add_argument('--epochs', default=20, type=int)
     self.parser.add_argument('--buffer_size', default=20000, type=int)
-    self.parser.add_argument('--batch_size', default=8, type=int)
-    self.parser.add_argument('--dimensions', default=512, type=int)
+    self.parser.add_argument('--batch_size', default=4, type=int)
+    self.parser.add_argument('--dimensions', default=128, type=int)
     self.parser.add_argument('--num_layers', default=4, type=int)
-    self.parser.add_argument('--num_heads', default=8, type=int)
+    self.parser.add_argument('--num_heads', default=4, type=int)
     self.parser.add_argument('--d_model', default=128, type=int)
-    self.parser.add_argument('--dff', default=512, type=int, help = "Positive integer, dimensionality of the output space for FF network")
+    self.parser.add_argument('--dff', default=128, type=int, help = "Positive integer, dimensionality of the output space for FF network")
     self.parser.add_argument('--dropout_rate', default=0.1, type=float)
 
-    self.parser.add_argument('--checkpoint_directory', default='/content/drive/My Drive/Colab Notebooks/data/checkpoints')
-    self.parser.add_argument('--log_directory', default='/content/drive/My Drive/Colab Notebooks/data/logs')
     self.parser.add_argument('--plot_directory', default='/content/drive/My Drive/Colab Notebooks/data/plots')
     
     # CWR

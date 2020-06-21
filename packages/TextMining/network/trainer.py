@@ -66,7 +66,8 @@ class Trainer:
 
         # if a checkpoint exists, restore the latest checkpoint. https://www.tensorflow.org/guide/checkpoint#loading_mechanics
         if self.ckptManager.latest_checkpoint:
-            self.ckpt.restore(self.ckptManager.latest_checkpoint)
+            status = self.ckpt.restore(self.ckptManager.latest_checkpoint)
+            status.assert_consumed()
             print ('Latest checkpoint restored!!')
             
         return
@@ -120,7 +121,7 @@ class Trainer:
 
         for epoch in range(epochs):
             self.startEpoch(epoch)
-
+            batch = 0
             # inp -> portuguese, tar -> english
             for (batch, (source, target)) in enumerate(dataset):
                 if (self.params.display_details == True) :
@@ -138,6 +139,7 @@ class Trainer:
         if not self.validationDataset:
             return
 
+        self.predictor.setModel(self.model)
         for (batch, (source, target)) in enumerate(self.validationDataset):
                 source = source.numpy().decode('utf-8')
                 target = target.numpy().decode('utf-8')
@@ -146,8 +148,6 @@ class Trainer:
                 
                 if (self.params.display_details == True) :
                     print('Batch: ', batch)
-                    print('source', source.shape)
-                    print('target', target.shape)
                     print('source: ', source)
                     print('target: ', target)
                     print('generated: ', generated)
